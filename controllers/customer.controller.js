@@ -9,6 +9,8 @@ const auth = require("../middleware/jwttoken")
 const common = require("../common")
 let datapart = require("./data")
 
+const axios = require('axios');
+
 const createUser = async (req, res) => {
     let data = req.body;
     const userSchema = Joi.object({
@@ -143,8 +145,99 @@ const login = async (req, res) => {
     };
 
 
+
+// const getToken = async (req, res) => {
+//     console.log(process.env.CLIENTSECRET,"process.env.CLIENTSECRET")
+//         const tenantId = req.body.tenatId;
+//         const clientId = process.env.CLIENTID;
+//         const clientSecret = process.env.CLIENTSECRET;
+//         const scope = process.env.SCOPE; // e.g., 'https://graph.microsoft.com/.default'
+//         const grantType = process.env.GRANT_TYPE;
+//         try {
+//           const response = await axios.post(
+//             `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+//             `client_id=${clientId}&client_secret=${clientSecret}&scope=${scope}&grant_type=${grantType}`,
+//             {
+//               headers: {
+//                 'Content-Type': 'application/x-www-form-urlencoded',
+//               },
+//             }
+//           );
+      
+//           // Access the token from the response
+//           const accessToken = response.data.access_token;
+//           console.log('Access Token:', accessToken);
+//           return accessToken;
+//         }
+//     catch (error) {
+//         console.log(error,"000")
+//         return res.status(500).json({
+//             message: "Internal server error!,", error,
+//             status: 500,
+
+//         })
+//     }
+
+// }
+const getToken = async (req, res) => {
+    const tenantId = req.body.tenatId;
+    const clientId = process.env.CLIENTID;
+    const clientSecret = process.env.CLIENTSECRET;
+    const scope = process.env.SCOPE; // e.g., 'https://graph.microsoft.com/.default'
+    const grantType = process.env.GRANT_TYPE;
+
+    const requestBody = new URLSearchParams();
+    requestBody.append('client_id', clientId);
+    requestBody.append('client_secret', clientSecret);
+    requestBody.append('scope', scope);
+    requestBody.append('grant_type', grantType);
+
+    try {
+        const response = await axios.post(
+            `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+            requestBody.toString(),  // Convert URLSearchParams to string
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        );
+
+        // Access the token from the response
+        const accessToken = response.data.access_token;
+        console.log('Access Token:', accessToken);
+        if(accessToken){
+            const newapi = await axios.get(
+                `https://graph.microsoft.com/v1.0/security/secureScores`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+    console.log(newapi,"--0-0-0-")
+            // Access the token from the response
+            return res.status(200).json({
+                message: "Data fetched successfully",
+                data: newapi.data,
+                status: 200
+            });
+        }
+        //return accessToken;
+    } catch (error) {
+        console.log(error, "000");
+        return res.status(500).json({
+            message: "Internal server error!",
+            error: error,
+            status: 500,
+        });
+    }
+};
+
 module.exports = {
     createUser,
     login,
-    getAllThirdData
+    getAllThirdData,
+    getToken
 }

@@ -79,13 +79,11 @@ const createUser = async (req, res) => {
 
 const login = async (req, res) => {
     //console.log(req.oidc.isAuthenticated(),"---0-0-0-0-0")
+    console.log("kkkkkkkkkk")
     try {
-        console.log("-----")
         let token = req.body.token;
         let publickey = process.env.PUBLICKEY;
-        console.log(publickey,"publickeypublickey")
          const decoded = await auth.jwtAuthVerify(token,publickey );
-        console.log(decoded, "00--");
         const existingUser = await userModel.findOne({
             where: {
 
@@ -95,7 +93,6 @@ const login = async (req, res) => {
 
             },
         })
-        console.log(existingUser, "existingUser")
         if (!existingUser) {
             const userPayload = {
                 email: decoded.email,

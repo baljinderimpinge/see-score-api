@@ -1,4 +1,4 @@
-const user= require("../models/customer.model");
+const user = require("../models/customer.model");
 const auth = require("../middleware/jwttoken")
 const common = require("../common")
 
@@ -29,9 +29,9 @@ const adminAuth = async (req, res, next) => {
             console.log(admin, "--++++");
 
             if (admin) {
-               
+
                 req.admin = admin;
-                next(); 
+                next();
             } else {
                 return res.status(403).json({ error: "Unauthorized" });
             }
@@ -45,11 +45,11 @@ const adminAuth = async (req, res, next) => {
 };
 
 const checkRole = (allowedRoles) => {
-    return async(req, res, next) => {
+    return async (req, res, next) => {
         try {
-          console.log(allowedRoles)
-            const userRole = req.admin.role; 
-console.log(userRole)
+            console.log(allowedRoles)
+            const userRole = req.admin.role;
+            console.log(userRole)
             if (allowedRoles.includes(userRole)) {
                 next();
             } else {
@@ -62,8 +62,7 @@ console.log(userRole)
     };
 };
 
-module.exports={
+module.exports = {
     adminAuth,
-     checkRole 
-
+    checkRole
 }

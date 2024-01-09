@@ -1,0 +1,19 @@
+{
+  "restartable": "rs",
+  "ignore": [],
+  "verbose": false,
+  "events": {
+    "restart": "echo 'Server restarted'"
+  },
+  "env": {
+    "MONGO_URI": "",
+    "PORT": 4000,
+    "AWS_S3_SECRET_ACCESS_KEY": "",
+    "AWS_S3_ACCESS_KEY_ID": "",
+    "AWS_S3_BUCKET": "",
+    "AWS_S3_REGION": "",
+    "JWT_SECRET_KEY": ""
+
+  },
+  "ext": "js ts"
+}

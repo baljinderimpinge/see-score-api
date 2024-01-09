@@ -1,0 +1,13 @@
+{
+    "restartable": "rs",
+    "ignore": [],
+    "verbose": false,
+    "events": {
+      "restart": "echo 'Server restarted'"
+    },
+    "env": {
+      "MONGO_URI": "",
+      "PORT": 4000
+    },
+    "ext": "js ts"
+  }

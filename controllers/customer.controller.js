@@ -85,8 +85,8 @@ const login = async (req, res) => {
         console.log("-----")
         let token = req.body.token;
         let publickey = process.env.PUBLICKEY;
-        console.log(publickey,"publickeypublickey")
-         const decoded = await auth.jwtAuthVerify(token,publickey );
+        console.log(publickey, "publickeypublickey")
+        const decoded = await auth.jwtAuthVerify(token, publickey);
         console.log(decoded, "00--");
         const existingUser = await userModel.findOne({
             where: {
@@ -104,22 +104,22 @@ const login = async (req, res) => {
                 firstName: decoded.given_name,
                 lastName: decoded.family_name,
                 isEmailVerified: decoded.email_verified,
-                password:"1234",
-                picture:decoded.picture,
+                password: "1234",
+                picture: decoded.picture,
                 creationTs: Date.now()
             };
             const result = await userModel.create(userPayload)
-                return res.status(200).json({
-                    message: "Login successfully",
-                    data: existingUser,
-                    status: 200
-                });
+            return res.status(200).json({
+                message: "Login successfully",
+                data: existingUser,
+                status: 200
+            });
         } else {
-                return res.status(200).json({
-                    message: "Login successfully",
-                    status: 200
-                });
-            } 
+            return res.status(200).json({
+                message: "Login successfully",
+                status: 200
+            });
+        }
     } catch (error) {
         return res.status(500).json({
             message: "Internal server error!,", error,
@@ -130,22 +130,22 @@ const login = async (req, res) => {
 
 }
 
-    const getAllThirdData = async (req, res) => {
-        try {
+const getAllThirdData = async (req, res) => {
+    try {
         let data = await datapart.dataPart();
-            return res.status(200).json({
-                message: "Data fetched successfully",
-                data: data.value,
-                status: 200
-            });
-        } catch (error) {
-            return res.status(500).json({
-                message: "Internal server error!",
-                error,
-                status: 500
-            });
-        }
-    };
+        return res.status(200).json({
+            message: "Data fetched successfully",
+            data: data.value,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error!",
+            error,
+            status: 500
+        });
+    }
+};
 
 
 
@@ -166,7 +166,7 @@ const login = async (req, res) => {
 //               },
 //             }
 //           );
-      
+
 //           // Access the token from the response
 //           const accessToken = response.data.access_token;
 //           console.log('Access Token:', accessToken);
@@ -209,7 +209,7 @@ const getToken = async (req, res) => {
         // Access the token from the response
         const accessToken = response.data.access_token;
         console.log('Access Token:', accessToken);
-        if(accessToken){
+        if (accessToken) {
             const newapi = await axios.get(
                 `https://graph.microsoft.com/v1.0/security/secureScores`,
                 {
@@ -219,11 +219,23 @@ const getToken = async (req, res) => {
                     },
                 }
             );
-    console.log(newapi,"--0-0-0-")
-            // Access the token from the response
+            console.log(newapi, "--0-0-0-")
+            let identity = newapi.data.value;
+            let identityScore = 0 ;
+            for(let i=0;i<identity.length;i++){
+                let tenant = identity[i];
+                if (tenant.azureTenantId === req.body.tenatId) {
+                    let score = tenant.averageComparativeScores;
+                    for(let j=0;j<score.length;j++){
+
+                    }
+                    break; 
+                }
+
+            }
             return res.status(200).json({
                 message: "Data fetched successfully",
-                data: newapi.data,
+                data: identityScores,
                 status: 200
             });
         }

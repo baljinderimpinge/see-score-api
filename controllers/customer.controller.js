@@ -34,7 +34,6 @@ const createUser = async (req, res) => {
         userPayload = schemaValidator.value
     }
     try {
-        console.log("------", userPayload)
         const checkData = await userModel.findAll({
             where: {
                 [Op.or]: {
@@ -56,7 +55,6 @@ const createUser = async (req, res) => {
                 isEmailVerify: true
 
             }
-            console.log(payload);
             const result = await userModel.create(payload)
             console.log(result, "gggggggggggggg");
             const token = await auth.jwtSign({ _id: result._id, role: result.role, email: result.role });
@@ -80,8 +78,6 @@ const createUser = async (req, res) => {
 
 
 const login = async (req, res) => {
-    //console.log(req.oidc.isAuthenticated(),"---0-0-0-0-0")
-    console.log("kkkkkkkkkk")
     try {
         let token = req.body.token;
         let publickey = process.env.PUBLICKEY;
@@ -145,45 +141,11 @@ const login = async (req, res) => {
     };
 
 
-
-// const getToken = async (req, res) => {
-//     console.log(process.env.CLIENTSECRET,"process.env.CLIENTSECRET")
-//         const tenantId = req.body.tenatId;
-//         const clientId = process.env.CLIENTID;
-//         const clientSecret = process.env.CLIENTSECRET;
-//         const scope = process.env.SCOPE; // e.g., 'https://graph.microsoft.com/.default'
-//         const grantType = process.env.GRANT_TYPE;
-//         try {
-//           const response = await axios.post(
-//             `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-//             `client_id=${clientId}&client_secret=${clientSecret}&scope=${scope}&grant_type=${grantType}`,
-//             {
-//               headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded',
-//               },
-//             }
-//           );
-      
-//           // Access the token from the response
-//           const accessToken = response.data.access_token;
-//           console.log('Access Token:', accessToken);
-//           return accessToken;
-//         }
-//     catch (error) {
-//         console.log(error,"000")
-//         return res.status(500).json({
-//             message: "Internal server error!,", error,
-//             status: 500,
-
-//         })
-//     }
-
-// }
 const getToken = async (req, res) => {
     const tenantId = req.body.tenatId;
     const clientId = process.env.CLIENTID;
     const clientSecret = process.env.CLIENTSECRET;
-    const scope = process.env.SCOPE; // e.g., 'https://graph.microsoft.com/.default'
+    const scope = process.env.SCOPE;
     const grantType = process.env.GRANT_TYPE;
 
     const requestBody = new URLSearchParams();
@@ -195,7 +157,7 @@ const getToken = async (req, res) => {
     try {
         const response = await axios.post(
             `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-            requestBody.toString(),  // Convert URLSearchParams to string
+            requestBody.toString(), 
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -205,7 +167,6 @@ const getToken = async (req, res) => {
 
         // Access the token from the response
         const accessToken = response.data.access_token;
-        console.log('Access Token:', accessToken);
         if(accessToken){
             const newapi = await axios.get(
                 `https://graph.microsoft.com/v1.0/security/secureScores`,
@@ -216,8 +177,6 @@ const getToken = async (req, res) => {
                     },
                 }
             );
-    console.log(newapi,"--0-0-0-")
-            // Access the token from the response
             return res.status(200).json({
                 message: "Data fetched successfully",
                 data: newapi.data,

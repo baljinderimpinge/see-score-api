@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const auth = require("../middleware/jwttoken")
 const common = require("../common")
 const { Sequelize } = require('sequelize');
+const axios = require('axios');
 
 
 
@@ -171,7 +172,7 @@ const getAllUsers = async (req, res) => {
             offset: skip,
             limit: size
         });
-
+console.log(users,"------")
         return res.status(200).json({
             message: "Data fetched successfully",
             data: users,
@@ -659,6 +660,53 @@ const deleteSubscription = async (req, res) => {
 };
 
 
+const createCustomer = async (req, res) => {
+    try {
+        let random = await auth.generateRandomString(12);
+        console.log(random,"---=-=-=")
+            const newapi = await axios.post(
+                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users`,
+                {
+                    "email":req.body.email,
+                    "password":random,
+                   
+                    "connection": "Username-Password-Authentication",
+                    "app_metadata": {
+                        "bussinessName": req.body.bussinessName,
+                        "bussinessAddress":req.body.bussinessAddress,
+                        "website":req.body.website,
+                        "industry":req.body.industry,
+                        "phone":req.body.phone,
+                        "name":req.body.name,
+                        "role":"Customer"
+                    }
+                },
+
+                {
+                    headers: {
+                        'Authorization': `Bearer ${process.env.API_ACCESS_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            console.log(newapi.data,"---=-=-=")
+            return res.status(200).json({
+                message: "user created Successfully",
+                data: newapi.data,
+                status: 200
+            })
+    } catch (error) {
+        console.log(error,"-=-=-")
+        return res.status(500).json({
+            message: "Internal server error!,", 
+            error:"AxiosError",
+            status: 500,
+
+        })
+    }
+
+}
+
 
 module.exports = {
     createUser,
@@ -672,5 +720,6 @@ module.exports = {
     getAllSubscription,
     getSubscriptionById,
     updateSubscription,
-    deleteSubscription
+    deleteSubscription,
+    createCustomer
 }

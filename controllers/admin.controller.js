@@ -699,7 +699,15 @@ const createCustomer = async (req, res) => {
                 status: 200
             })
     } catch (error) {
-        console.log(error,"-=-=-")
+    if(error.response.data.message = "The user already exists."){
+        console.log("----")
+        return res.status(500).json({
+            message: "The user already exists", 
+            error:"AxiosError",
+            status: 500,
+
+        })
+}
         return res.status(500).json({
             message: "Internal server error!,", 
             error:"AxiosError",

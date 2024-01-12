@@ -9,6 +9,7 @@ const auth = require("../middleware/jwttoken")
 const common = require("../common")
 const { Sequelize } = require('sequelize');
 const axios = require('axios');
+const template = require('../template/email')
 
 
 
@@ -662,22 +663,23 @@ const deleteSubscription = async (req, res) => {
 
 const createCustomer = async (req, res) => {
     try {
+        console.log(req.body,"----")
         let random = await auth.generateRandomString(12);
         console.log(random,"---=-=-=")
             const newapi = await axios.post(
                 `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users`,
                 {
-                    "email":req.body.email,
+                    "email":req.body.contactEmail,
                     "password":random,
                    
                     "connection": "Username-Password-Authentication",
                     "app_metadata": {
-                        "bussinessName": req.body.bussinessName,
-                        "bussinessAddress":req.body.bussinessAddress,
+                        "bussinessName": req.body.businessName,
+                        "bussinessAddress":req.body.businessAddress,
                         "website":req.body.website,
                         "industry":req.body.industry,
-                        "phone":req.body.phone,
-                        "name":req.body.name,
+                        "phone":req.body.contactNumber,
+                        "name":req.body.contactName,
                         "role":"Customer"
                     }
                 },
@@ -690,6 +692,7 @@ const createCustomer = async (req, res) => {
                 }
             );
             console.log(newapi.data,"---=-=-=")
+             template.newaccountPassword(req.body.contactEmail,random);
             return res.status(200).json({
                 message: "user created Successfully",
                 data: newapi.data,

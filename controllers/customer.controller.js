@@ -104,7 +104,7 @@ const login = async (req, res) => {
                 picture: decoded.picture,
                 creationTs: Date.now()
             };
-            const result = await userModel.create(userPayload)
+           // const result = await userModel.create(userPayload)
             return res.status(200).json({
                 message: "Login successfully",
                 data: existingUser,

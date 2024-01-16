@@ -664,6 +664,31 @@ const deleteSubscription = async (req, res) => {
 const createCustomer = async (req, res) => {
     try {
         console.log(req.body,"----")
+        if(req.body.contactEmail==""){
+            return res.status(500).json({
+                message: "please enter a user email", 
+                status: 500,
+    
+            })
+        }
+        const tokenapi = await axios.post(
+            `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/oauth/token`,
+                {
+                    "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
+                    "client_secret": process.env.AUTH_TOKEN_CLIENT_SECRET,
+                    "audience": process.env.AUTH_TOKEN_AUDIENCE,
+                    "grant_type": process.env.AUTH_TOKEN_GRANT_TYPE
+                
+            },
+
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+let newtoken = tokenapi.data.access_token;
+console.log(tokenapi.data.access_token,"tokenapitokenapi")
         let random = await auth.generateRandomString(12);
         console.log(random,"---=-=-=")
             const newapi = await axios.post(
@@ -686,7 +711,7 @@ const createCustomer = async (req, res) => {
 
                 {
                     headers: {
-                        'Authorization': `Bearer ${process.env.API_ACCESS_TOKEN}`,
+                        'Authorization': `Bearer ${newtoken}`,
                         'Content-Type': 'application/json',
                     },
                 }
@@ -695,19 +720,20 @@ const createCustomer = async (req, res) => {
              template.newaccountPassword(req.body.contactEmail,random);
             return res.status(200).json({
                 message: "user created Successfully",
-                data: newapi.data,
+                //data: newapi.data,
                 status: 200
             })
     } catch (error) {
-    if(error.response.data.message = "The user already exists."){
-        console.log("----")
-        return res.status(500).json({
-            message: "The user already exists", 
-            error:"AxiosError",
-            status: 500,
+        console.log(error,"----+++++")
+//     if(error.response.data.message = "The user already exists."){
+//         console.log("----")
+//         return res.status(500).json({
+//             message: "The user already exists", 
+//             error:"AxiosError",
+//             status: 500,
 
-        })
-}
+//         })
+// }
         return res.status(500).json({
             message: "Internal server error!,", 
             error:"AxiosError",

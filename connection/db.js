@@ -1,6 +1,6 @@
 
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize("seeScore_backend", "postgres", "Dell@1234", {
+const sequelize = new Sequelize("seescore_backend", "postgres", "admin", {
   host: "localhost",
   dialect: "postgres",
   operatorsAliases: false,

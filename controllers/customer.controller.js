@@ -94,11 +94,12 @@ const login = async (req, res) => {
             },
         })
         if (!existingUser) {
+            console.log(decoded,"decoded")
             const userPayload = {
                 email: decoded.email,
-                firstName: decoded.given_name,
-                lastName: decoded.family_name,
-                isEmailVerified: decoded.email_verified,
+                firstName: decoded.name,
+                lastName: decoded.lastname || null,
+                isEmailVerified: decoded.email_verified || null,
                 password: "1234",
                 picture: decoded.picture,
                 creationTs: Date.now()
@@ -116,6 +117,7 @@ const login = async (req, res) => {
             });
         }
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             message: "Internal server error!,", error,
             status: 500,

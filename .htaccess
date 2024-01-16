@@ -1,0 +1,46 @@
+# Enable Rewrite Engine
+RewriteEngine On
+RewriteBase /
+
+# Redirect HTTPS to HTTP
+RewriteCond %{HTTPS} on
+RewriteRule ^ http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# URL Rewriting Example (uncomment to use)
+# RewriteRule ^user/([0-9]+)$ user.php?id=$1 [L,QSA]
+
+# Custom Error Pages
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# Prevent Directory Listing
+Options -Indexes
+
+# Disable Server Signature
+ServerSignature Off
+
+# Set Default Charset
+AddDefaultCharset UTF-8
+
+# Disable Caching for Specific File Types (uncomment to use)
+# <FilesMatch "\.(html|htm|js|css)$">
+#   FileETag None
+#   <IfModule mod_headers.c>
+#       Header unset ETag
+#       Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+#       Header set Pragma "no-cache"
+#       Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+#   </IfModule>
+# </FilesMatch>
+
+# Additional security headers (uncomment to use)
+# <IfModule mod_headers.c>
+#   Header set X-Content-Type-Options "nosniff"
+#   Header set X-XSS-Protection "1; mode=block"
+#   Header set X-Frame-Options "SAMEORIGIN"
+# </IfModule>
+
+# Note: Uncomment lines (remove the '#' at the beginning of the line) to enable that particular setting.
+
+
+

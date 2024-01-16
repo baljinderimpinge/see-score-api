@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const crypto = require('crypto');
 
 module.exports={
     jwtSign : async(payload)=>{
@@ -23,7 +23,23 @@ module.exports={
         } catch (error) {
             throw error;
         }
+    },
+generateRandomString :async (length) => {
+    try{
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomString = '';
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomString += characters.charAt(randomIndex);
     }
+
+    return randomString;
+}catch (error) {
+    throw error;
+}
+}
+
 }
       
         

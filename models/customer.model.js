@@ -6,15 +6,15 @@ const Customer = db.sequelize.define("Customers", {
     //id: { type: Sequelize.INTEGER, primaryKey: true },
     firstName: {
         type: Sequelize.STRING,
-        allowNull: false
+        
     },
     lastName: {
         type: Sequelize.STRING,
-        allowNull: false
+       
     },
     password: {
         type: Sequelize.STRING,
-        allowNull: false
+  
     },
     email: {
         type: Sequelize.STRING,

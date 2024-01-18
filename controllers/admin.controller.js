@@ -723,7 +723,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 clientId: process.env.AUTH_TOKEN_CLIENT_ID,
                 clientSecret: process.env.AUTH_TOKEN_CLIENT_SECRET,
               });
-            let result =  await ac.requestChangePasswordEmail({
+            let result =  await ac.createPasswordChangeTicket({
                 email: req.body.contactEmail,
                 connection: "Username-Password-Authentication",
               });

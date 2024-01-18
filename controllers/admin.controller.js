@@ -716,6 +716,22 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 }
             );
             console.log(newapi.data,"---=-=-=")
+            const resetPasswordResponse = await axios.post(
+                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/dbconnections/change_password`,
+                {
+                    "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
+                    "email": req.body.contactEmail,
+                    "connection": "Username-Password-Authentication",
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+    
+            console.log(resetPasswordResponse.data, "--- Reset Password Response");
+    
             // template.newaccountPassword(req.body.contactEmail,random);
             return res.status(200).json({
                 message: "user created Successfully",

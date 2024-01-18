@@ -716,7 +716,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 }
             );
             console.log(newapi.data,"---=-=-=")
-             template.newaccountPassword(req.body.contactEmail,random);
+            // template.newaccountPassword(req.body.contactEmail,random);
             return res.status(200).json({
                 message: "user created Successfully",
                 //data: newapi.data,

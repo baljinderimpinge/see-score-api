@@ -718,7 +718,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 }
             );
             console.log(newapi.data,"---=-=-=")
-            const ac = new AuthenticationClient({
+            const ac = new ManagementClient({
                 domain: "dev-3hmsijzw0t7ryxrl.us.auth0.com",
                 clientId: process.env.AUTH_TOKEN_CLIENT_ID,
                 clientSecret: process.env.AUTH_TOKEN_CLIENT_SECRET,

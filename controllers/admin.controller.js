@@ -689,14 +689,13 @@ const createCustomer = async (req, res) => {
         );
 let newtoken = tokenapi.data.access_token;
 console.log(tokenapi.data.access_token,"tokenapitokenapi")
-        let random = await auth.generateRandomString(12);
-        console.log(random,"---=-=-=")
+        // let random = await auth.generateRandomString(12);
+        // console.log(random,"---=-=-=")
             const newapi = await axios.post(
                 `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users`,
                 {
                     "email":req.body.contactEmail,
-                    "password":random,
-                   
+                    "verify_email": true,
                     "connection": "Username-Password-Authentication",
                     "app_metadata": {
                         "bussinessName": req.body.businessName,

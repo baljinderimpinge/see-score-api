@@ -10,8 +10,7 @@ const common = require("../common")
 const { Sequelize } = require('sequelize');
 const axios = require('axios');
 const template = require('../template/email')
-const { AuthenticationClient, ManagementClient } = require('auth0');
- 
+
 
 
 const createUser = async (req, res) => {
@@ -696,8 +695,8 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users`,
                 {
                     "email":req.body.contactEmail,
-                    "verify_email": true,
                     "password":random,
+                   
                     "connection": "Username-Password-Authentication",
                     "app_metadata": {
                         "bussinessName": req.body.businessName,
@@ -718,17 +717,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 }
             );
             console.log(newapi.data,"---=-=-=")
-            const ac = new ManagementClient({
-                domain: "dev-3hmsijzw0t7ryxrl.us.auth0.com",
-                clientId: process.env.AUTH_TOKEN_CLIENT_ID,
-                clientSecret: process.env.AUTH_TOKEN_CLIENT_SECRET,
-              });
-            let result =  await ac.createPasswordChangeTicket({
-                email: req.body.contactEmail,
-                connection: "Username-Password-Authentication",
-              });
-              console.log(result,"-=-=-=-=")
-            // template.newaccountPassword(req.body.contactEmail,random);
+             template.newaccountPassword(req.body.contactEmail,random);
             return res.status(200).json({
                 message: "user created Successfully",
                 //data: newapi.data,
@@ -736,7 +725,15 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
             })
     } catch (error) {
         console.log(error,"----+++++")
+//     if(error.response.data.message = "The user already exists."){
+//         console.log("----")
+//         return res.status(500).json({
+//             message: "The user already exists", 
+//             error:"AxiosError",
+//             status: 500,
 
+//         })
+// }
         return res.status(500).json({
             message: "Internal server error!,", 
             error:"AxiosError",

@@ -668,7 +668,6 @@ const createCustomer = async (req, res) => {
             return res.status(500).json({
                 message: "please enter a user email", 
                 status: 500,
-    
             })
         }
         const tokenapi = await axios.post(
@@ -708,7 +707,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                         "role":"Customer"
                     }
                 },
-
+                
                 {
                     headers: {
                         'Authorization': `Bearer ${newtoken}`,
@@ -717,23 +716,24 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 }
             );
             console.log(newapi.data,"---=-=-=")
-             template.newaccountPassword(req.body.contactEmail,random);
+            let createuser = newapi.data;
+            let useremail = createuser.email;
+            const passApi = await axios.post(
+                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/dbconnections/change_password`,
+                {
+                
+                        "client_id":  process.env.AUTH_TOKEN_CLIENT_ID,
+                        "email": useremail,
+                        "connection": "Username-Password-Authentication"
+                      
+                },
+            );
             return res.status(200).json({
-                message: "user created Successfully",
-                //data: newapi.data,
+                message: "user created Successfully and An email has been sent to the user for set up the password",
                 status: 200
             })
     } catch (error) {
         console.log(error,"----+++++")
-//     if(error.response.data.message = "The user already exists."){
-//         console.log("----")
-//         return res.status(500).json({
-//             message: "The user already exists", 
-//             error:"AxiosError",
-//             status: 500,
-
-//         })
-// }
         return res.status(500).json({
             message: "Internal server error!,", 
             error:"AxiosError",

@@ -8,4 +8,9 @@ router.post("/login",customer.login)
 router.get("/data",customer.getAllThirdData)
 router.post("/tenantid",customer.getToken)
 
+router.get("/recomen",customer.getRecomendations)
+
+
+
+
 module.exports = router

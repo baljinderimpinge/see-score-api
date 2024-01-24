@@ -247,9 +247,72 @@ const getToken = async (req, res) => {
     }
 };
 
+
+
+const getRecomendations = async (req, res) => {
+    const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
+    const clientId = process.env.CLIENTID;
+    const clientSecret = process.env.CLIENTSECRET;
+    const scope = process.env.SCOPE;
+    const grantType = process.env.GRANT_TYPE;
+
+    const requestBody = new URLSearchParams();
+    requestBody.append('client_id', clientId);
+    requestBody.append('client_secret', clientSecret);
+    requestBody.append('scope', scope);
+    requestBody.append('grant_type', grantType);
+
+    try {
+        const response = await axios.post(
+            `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+            requestBody.toString(), 
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        );
+
+        // Access the token from the response
+        const accessToken = response.data.access_token;
+        console.log('Access Token:', accessToken);
+        if (accessToken) {
+            const newapi = await axios.get(
+                `https://graph.microsoft.com/beta/directory/recommendations`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            console.log(newapi, "--0-0-0-")
+            let activestatus = newapi.data.value;
+            const activeObjects = activestatus.filter(obj => obj.status === 'active');
+            console.log(activeObjects,"activeObjectsactiveObjectsactiveObjects")
+            
+            return res.status(200).json({
+                message: "Data fetched successfully",
+               data: activeObjects,
+                status: 200
+            });
+        }
+        //return accessToken;
+    } catch (error) {
+        console.log(error, "000");
+        return res.status(500).json({
+            message: "Internal server error!",
+            error: error,
+            status: 500,
+        });
+    }
+};
+
+
 module.exports = {
     createUser,
     login,
     getAllThirdData,
-    getToken
+    getToken,
+    getRecomendations
 }

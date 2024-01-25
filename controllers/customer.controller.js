@@ -84,35 +84,41 @@ const login = async (req, res) => {
         console.log(publickey, "publickeypublickey")
         const decoded = await auth.jwtAuthVerify(token, publickey);
         console.log(decoded, "00--");
-        // const existingUser = await userModel.findOne({
-        //     where: {
+        const tokenapi = await axios.post(
+            `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/oauth/token`,
+                {
+                    "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
+                    "client_secret": process.env.AUTH_TOKEN_CLIENT_SECRET,
+                    "audience": process.env.AUTH_TOKEN_AUDIENCE,
+                    "grant_type": process.env.AUTH_TOKEN_GRANT_TYPE
+                
+            },
 
-        //         email: decoded.email,
-        //         role: common.constant.CONSTANTS.CUSTOMER,
-        //         isDeleted: false
-
-        //     },
-        // })
-        // if (!existingUser) {
-        //     console.log(decoded,"decoded")
-        //     const userPayload = {
-        //         email: decoded.email,
-        //         firstName: decoded.name,
-        //         lastName: decoded.lastname || null,
-        //         isEmailVerified: decoded.email_verified || null,
-        //         password: "1234",
-        //         picture: decoded.picture,
-        //         creationTs: Date.now()
-        //     };
-        //     return res.status(200).json({
-        //         message: "Login successfully",
-        //         data: existingUser,
-        //         status: 200
-        //     });
-       // } 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+let newtoken = tokenapi.data.access_token;
+console.log(tokenapi.data.access_token,"tokenapitokenapi")
+        let random = await auth.generateRandomString(12);
+        console.log(random,"---=-=-=")
+            const newapi = await axios.get(
+                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users/${decoded.sub}`,
+                
+                {
+                    headers: {
+                        'Authorization': `Bearer ${newtoken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            console.log(newapi.data,"---=-=-=")
+            let datamain = newapi.data;
             return res.status(200).json({
                 message: "Login successfully",
-                data: decoded,
+                data: datamain,
                 status: 200
             });
        

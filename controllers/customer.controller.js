@@ -151,7 +151,8 @@ const getAllThirdData = async (req, res) => {
 };
 
 const getToken = async (req, res) => {
-    const tenantId = req.body.tenatId;
+   // const tenantId = req.body.tenatId;
+   const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
     const clientId = process.env.CLIENTID;
     const clientSecret = process.env.CLIENTSECRET;
     const scope = process.env.SCOPE;

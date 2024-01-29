@@ -188,14 +188,13 @@ const getToken = async (req, res) => {
                 }
             );
            // console.log(newapi, "--0-0-0-")
-           let identity = newapi.data.value;
-            //let identity = newapi.data.value[0].controlScores;
-         //   const activeObjects = identity.filter(obj => obj.controlName === 'UserRiskPolicy');
+            let identity = newapi.data.value[0].controlScores;
+            const activeObjects = identity.filter(obj => obj.controlName === 'UserRiskPolicy');
 
            
             return res.status(200).json({
                 message: "Data fetched successfully",
-                data: identity,
+                data: activeObjects,
                 status: 200
             });
         }

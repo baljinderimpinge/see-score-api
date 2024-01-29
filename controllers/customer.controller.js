@@ -152,7 +152,7 @@ const getAllThirdData = async (req, res) => {
 
 const getToken = async (req, res) => {
    // const tenantId = req.body.tenatId;
-   const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
+   const tenantId = req.body.tenantID;
     const clientId = process.env.CLIENTID;
     const clientSecret = process.env.CLIENTSECRET;
     const scope = process.env.SCOPE;
@@ -188,13 +188,14 @@ const getToken = async (req, res) => {
                 }
             );
            // console.log(newapi, "--0-0-0-")
-            let identity = newapi.data.value[0].controlScores;
-            const activeObjects = identity.filter(obj => obj.controlName === 'UserRiskPolicy');
+           let identity = newapi.data.value;
+            //let identity = newapi.data.value[0].controlScores;
+         //   const activeObjects = identity.filter(obj => obj.controlName === 'UserRiskPolicy');
 
            
             return res.status(200).json({
                 message: "Data fetched successfully",
-                data: activeObjects,
+                data: identity,
                 status: 200
             });
         }
@@ -212,7 +213,8 @@ const getToken = async (req, res) => {
 
 
 const getRecomendations = async (req, res) => {
-    const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
+    // const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
+    const tenantId = req.body.tenantID;
     const clientId = process.env.CLIENTID;
     const clientSecret = process.env.CLIENTSECRET;
     const scope = process.env.SCOPE;

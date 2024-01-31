@@ -155,7 +155,7 @@ const getAllUsers = async (req, res) => {
         if (req.query.search) {
             qry[Sequelize.Op.or] = [
                 {
-                    firstName: {
+                    name: {
                         [Sequelize.Op.like]: `%${req.query.search}%`
                     }
                 },
@@ -716,6 +716,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                 }
             );
             console.log(newapi.data,"---=-=-=")
+          
             let createuser = newapi.data;
             let useremail = createuser.email;
             const passApi = await axios.post(
@@ -728,6 +729,19 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                       
                 },
             );
+            const userPayload = {
+                email:useremail,
+                name: req.body.contactName,
+                picture:createuser.picture,
+                bussinessName: req.body.businessName,
+                bussinessAddress:req.body.businessAddress,
+                website:req.body.website,
+                industry:req.body.industry,
+                phone:req.body.contactNumber,
+                role:"Customer",
+                creationTs: Date.now()
+            };
+            const result = await userModel.create(userPayload)
             return res.status(200).json({
                 message: "user created Successfully and An email has been sent to the user for set up the password",
                 status: 200
@@ -740,6 +754,108 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
             status: 500,
 
         })
+    }
+
+}
+
+
+
+const getAllAuthCustomers = async (req, res) => {
+    try {
+        console.log(req.body,"----")
+        const tokenapi = await axios.post(
+            `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/oauth/token`,
+                {
+                    "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
+                    "client_secret": process.env.AUTH_TOKEN_CLIENT_SECRET,
+                    "audience": process.env.AUTH_TOKEN_AUDIENCE,
+                    "grant_type": process.env.AUTH_TOKEN_GRANT_TYPE
+                
+            },
+
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+let newtoken = tokenapi.data.access_token;
+console.log(tokenapi.data.access_token,"tokenapitokenapi")
+        let random = await auth.generateRandomString(12);
+        console.log(random,"---=-=-=")
+            const newapi = await axios.get(
+                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users`,
+               
+                {
+                    headers: {
+                        'Authorization': `Bearer ${newtoken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            const customerData = newapi.data.filter(user => user.app_metadata && user.app_metadata.role === "Customer");
+            return res.status(200).json({
+                message: "fetched",
+                data:customerData,
+                status: 200
+            })
+    } catch (error) {
+        console.log(error,"----+++++")
+        return res.status(500).json({
+            message: "Internal server error!,", 
+            error:"AxiosError",
+            status: 500,
+
+        })
+    }
+
+}
+
+const getAllCustomers = async (req, res) => {
+    try {
+        let page = parseInt(req.query.page) || 1;
+        let size = parseInt(req.query.size) || 10;
+        let skip = (page - 1) * size;
+
+        let qry = {
+            role: "Customer",
+            isDeleted: false
+        };
+
+        if (req.query.search) {
+            qry[Sequelize.Op.or] = [
+                {
+                    name: {
+                        [Sequelize.Op.like]: `%${req.query.search}%`
+                    }
+                },
+                {
+                    email: {
+                        [Sequelize.Op.like]: `%${req.query.search}%`
+                    }
+                }
+            ];
+        }
+        
+
+        const { rows: users, count: total } = await userModel.findAndCountAll({
+            where: qry,
+            offset: skip,
+            limit: size
+        });
+console.log(users,"------")
+        return res.status(200).json({
+            message: "Data fetched successfully",
+            data: users,
+            total,
+            status: 200
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error!",
+            error,
+            status: 500
+        });
     }
 
 }
@@ -758,5 +874,7 @@ module.exports = {
     getSubscriptionById,
     updateSubscription,
     deleteSubscription,
-    createCustomer
+    createCustomer,
+    getAllCustomers,
+    getAllAuthCustomers
 }

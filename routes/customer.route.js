@@ -9,6 +9,7 @@ router.get("/data",customer.getAllThirdData)
 router.post("/tenantid",customer.getToken)
 
 router.post("/recomen",customer.getRecomendations)
+router.post("/azuread",customer.addCustomerInAzure)
 
 
 

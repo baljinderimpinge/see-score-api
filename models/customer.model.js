@@ -4,37 +4,33 @@ const db = require("../connection/db");
 
 const Customer = db.sequelize.define("Customers", {
     //id: { type: Sequelize.INTEGER, primaryKey: true },
-    firstName: {
+    name: {
         type: Sequelize.STRING,
         
-    },
-    lastName: {
-        type: Sequelize.STRING,
-       
-    },
-    password: {
-        type: Sequelize.STRING,
-  
     },
     email: {
         type: Sequelize.STRING,
     },
-    status: {
-        type: Sequelize.BOOLEAN,
+    role: {
+        type: Sequelize.STRING,
     },
-    isEmailVerify: {
-        type: Sequelize.BOOLEAN,
+    phone: {
+        type: Sequelize.STRING,
     },
-    subdomain: {
+    bussinessName: {
+        type: Sequelize.STRING,
+    },
+    bussinessAddress: {
+        type: Sequelize.STRING,
+    },
+    website: {
         type: Sequelize.STRING,
     },
     picture: {
         type: Sequelize.STRING,
     },
-    role: {
-        type: Sequelize.ENUM,
-    values: ['1', '2'], // '1' represents ADMIN, '2' represents CUSTOMER
-    defaultValue: '2'
+    industry: {
+        type: Sequelize.STRING,
     },
     isDeleted: {
         type: Sequelize.BOOLEAN,

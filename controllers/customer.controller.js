@@ -12,6 +12,7 @@ const { ConfidentialClientApplication } = require('@azure/msal-node');
 const { GraphRbacManagementClient } = require('@azure/graph');
 const { ClientSecretCredential } = require("@azure/identity");
 const { DefaultAzureCredential } = require("@azure/identity");
+const { Client } = require("@microsoft/microsoft-graph-client");
 
 const axios = require('axios');
 
@@ -154,7 +155,7 @@ const getAllThirdData = async (req, res) => {
     }
 };
 
-const getToken = async (req, res) => {
+const   getToken = async (req, res) => {
    // const tenantId = req.body.tenatId;
    const tenantId = req.body.tenantID;
     const clientId = process.env.CLIENTID;
@@ -538,37 +539,103 @@ const getRecomendations = async (req, res) => {
 //     }
 // };
 
+// const addCustomerInAzure = async (req, res) => {
+//     const clientId = process.env.MICROSOFT_CLIENT_ID;
+//     const clientSecret = process.env.CLIENTSECRET;
+//     const tenantId = process.env.MICROSOFT_TENANT;
+
+//     try {
+//         const userDetails = req.body;
+
+//         const credentials = new ClientSecretCredential(tenantId, clientId, clientSecret);
+//         const tokenResponse = await credentials.getToken(['https://graph.microsoft.com/.default']);
+// console.log(tokenResponse,"tokenResponse")
+//         // if (!tokenResponse || !tokenResponse.accessToken) {
+//         //     return res.status(500).json({
+//         //         message: 'Internal server error',
+//         //         error: 'Access Token missing',
+//         //         status: 500,
+//         //     });
+//         // }
+
+//         const client = new GraphRbacManagementClient({
+//             credentials: {
+//                 tokenCredential: {
+//                     getToken: async () => ({
+//                         token: tokenResponse.accessToken,
+//                         expiresOnTimestamp: Date.now() + 3600000, // Assuming the token expires in 1 hour
+//                     }),
+//                 },
+//             },
+//             endpoint: 'https://graph.microsoft.com',
+//             baseUri: 'https://graph.microsoft.com',
+//         });
+
+//         const createdUser = await client.users.create({
+//             accountEnabled: true,
+//             displayName: userDetails.displayName,
+//             mailNickname: userDetails.mailNickname,
+//             userPrincipalName: userDetails.userPrincipalName,
+//             passwordProfile: {
+//                 password: userDetails.password,
+//                 forceChangePasswordNextSignIn: false,
+//             },
+//         });
+
+//         return res.status(200).json({
+//             message: 'User created successfully',
+//             user: createdUser,
+//             status: 200,
+//         });
+//     } catch (error) {
+//         console.error('Error adding customer in Azure:', error);
+//         return res.status(500).json({
+//             message: 'Internal server error',
+//             error: error.message,
+//             status: 500,
+//         });
+//     }
+// };
+
 const addCustomerInAzure = async (req, res) => {
-    const clientId = process.env.MICROSOFT_CLIENT_ID;
-
     try {
-        const userDetails = req.body;
+        const clientId = process.env.MICROSOFT_CLIENT_ID;
+        const clientSecret = process.env.CLIENTSECRET;
+        const tenantId = process.env.MICROSOFT_TENANT;
 
-        const credentials = new DefaultAzureCredential();
-        const tokenResponse = await credentials.getToken(["https://graph.microsoft.com/.default"]);
-        console.log(tokenResponse, "tokenResponse");
+        const credentials = new ClientSecretCredential(tenantId, clientId, clientSecret);
+        const tokenResponse = await credentials.getToken(['https://graph.microsoft.com/.default']);
 
-        const client = new GraphRbacManagementClient({
-            credentials: credentials,
-            endpoint: 'https://graph.microsoft.com',
-            baseUri: `https://graph.microsoft.com/${process.env.MICROSOFT_TENANT}`,
-        });
+        console.log("Token Response:", tokenResponse);
 
-        const createdUser = await client.users.create({
-            accountEnabled: true,
-            displayName: userDetails.displayName,
-            mailNickname: userDetails.mailNickname,
-            userPrincipalName: userDetails.userPrincipalName,
-            passwordProfile: {
-                password: userDetails.password,
-                forceChangePasswordNextSignIn: false,
+        const client = Client.initWithMiddleware({
+            authProvider: (done) => {
+                done(null, tokenResponse.token);
             },
         });
 
+        const userDetails = req.body;
+
+        // Create the user in Azure AD
+        const createdUser = await client.api('/users')
+            .version('beta')
+            .post({
+                accountEnabled: true,
+                displayName: userDetails.displayName,
+                mailNickname: userDetails.mailNickname,
+                userPrincipalName: userDetails.userPrincipalName,
+                passwordProfile: {
+                    password: userDetails.password,
+                    forceChangePasswordNextSignIn: false,
+                },
+            });
+
+        // Continue with the rest of your logic...
+
         return res.status(200).json({
-            message: 'User created successfully',
+            message: "User created successfully",
             user: createdUser,
-            status: 200,
+            status: 200
         });
     } catch (error) {
         console.error('Error adding customer in Azure:', error);

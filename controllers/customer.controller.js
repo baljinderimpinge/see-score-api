@@ -157,44 +157,26 @@ const getAllThirdData = async (req, res) => {
 
 const   getToken = async (req, res) => {
    // const tenantId = req.body.tenatId;
-   const tenantId = req.body.tenantID;
-    const clientId = process.env.CLIENTID;
-    const clientSecret = process.env.CLIENTSECRET;
-    const scope = process.env.SCOPE;
-    const grantType = process.env.GRANT_TYPE;
-
-    const requestBody = new URLSearchParams();
-    requestBody.append('client_id', clientId);
-    requestBody.append('client_secret', clientSecret);
-    requestBody.append('scope', scope);
-    requestBody.append('grant_type', grantType);
+   const token = req.body.token;
 
     try {
-        const response = await axios.post(
-            `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-            requestBody.toString(), 
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            }
-        );
 
-        const accessToken = response.data.access_token;
-        console.log('Access Token:', accessToken);
-        if (accessToken) {
+        if (token) {
             const newapi = await axios.get(
                 `https://graph.microsoft.com/v1.0/security/secureScores`,
                 {
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 }
             );
-           // console.log(newapi, "--0-0-0-")
-            let identity = newapi.data.value[0].controlScores;
-            const activeObjects = identity.filter(obj => obj.controlName === 'UserRiskPolicy');
+          // console.log(newapi, "--0-0-0-")
+          let data = newapi.data;
+          let newdata = data?.value[0]?.controlScores;
+            const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
+            // let identity = newapi?.data?.value[0]?.controlScores;
+            // const activeObjects = identity?.filter(obj => obj.controlName === 'UserRiskPolicy');
 
            
             return res.status(200).json({
@@ -218,38 +200,39 @@ const   getToken = async (req, res) => {
 
 const getRecomendations = async (req, res) => {
     // const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
-    const tenantId = req.body.tenantID;
-    const clientId = process.env.CLIENTID;
-    const clientSecret = process.env.CLIENTSECRET;
-    const scope = process.env.SCOPE;
-    const grantType = process.env.GRANT_TYPE;
+    const token = req.body.token;
+    // const tenantId = req.body.tenantID;
+    // const clientId = process.env.CLIENTID;
+    // const clientSecret = process.env.CLIENTSECRET;
+    // const scope = process.env.SCOPE;
+    // const grantType = process.env.GRANT_TYPE;
 
-    const requestBody = new URLSearchParams();
-    requestBody.append('client_id', clientId);
-    requestBody.append('client_secret', clientSecret);
-    requestBody.append('scope', scope);
-    requestBody.append('grant_type', grantType);
+    // const requestBody = new URLSearchParams();
+    // requestBody.append('client_id', clientId);
+    // requestBody.append('client_secret', clientSecret);
+    // requestBody.append('scope', scope);
+    // requestBody.append('grant_type', grantType);
 
     try {
-        const response = await axios.post(
-            `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-            requestBody.toString(), 
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            }
-        );
+        // const response = await axios.post(
+        //     `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+        //     requestBody.toString(), 
+        //     {
+        //         headers: {
+        //             'Content-Type': 'application/x-www-form-urlencoded',
+        //         },
+        //     }
+        // );
 
-        // Access the token from the response
-        const accessToken = response.data.access_token;
-        console.log('Access Token:', accessToken);
-        if (accessToken) {
+        // // Access the token from the response
+        // const accessToken = response.data.access_token;
+        // console.log('Access Token:', accessToken);
+        if (token) {
             const newapi = await axios.get(
                 `https://graph.microsoft.com/beta/directory/recommendations`,
                 {
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 }

@@ -31,7 +31,7 @@ app.use("/", router)
 
 
 db.sequelize.sync().then(() => {
-    app.listen(4003, () => {
+    app.listen(4000, () => {
         console.log("server is working on port 4000")
     })
     console.log('Connection has been established successfully.');

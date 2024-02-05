@@ -21,6 +21,7 @@ router.delete("/subscription/:id",middleware.adminAuth,middleware.checkRole(["1"
 router.post("/changepassword",middleware.adminAuth,middleware.checkRole(["1"]),admin.changePassword)
 
 router.post("/authCustomer",admin.createCustomer)
+router.get("/getallcustomers",admin.getAllCustomers)
 
 
 module.exports = router

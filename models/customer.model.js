@@ -36,6 +36,10 @@ const Customer = db.sequelize.define("Customers", {
         type: Sequelize.BOOLEAN,
         defaultValue:false
     },
+    // token:{
+    //     type: Sequelize.STRING,
+    //     defaultValue: null
+    // }
     // subscriptionId: {
     //     type: Sequelize.INTEGER, // Assuming customerId is an integer (adjust the type accordingly)
     //     allowNull: false,

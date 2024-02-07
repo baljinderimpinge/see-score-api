@@ -1,8 +1,12 @@
 const customer = require("./customer.model");
 const subscription = require("./subscription.model")
 const userTokenmodel = require("./userToken")
+const customerSecurityChecklist = require("./customerSecurityChecklist")
+const securityChecklist = require('./securitychecklist')
 const model = {};
 model.userModel = customer;
 model.subscriptionModel = subscription;
 model.userTokenmodel = userTokenmodel;
+model.customerSecurityChecklist = customerSecurityChecklist;
+model.securityChecklist = securityChecklist;
 module.exports = model;

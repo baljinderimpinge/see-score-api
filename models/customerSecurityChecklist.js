@@ -4,7 +4,7 @@ const db = require("../connection/db");
 const securityChecklist = require("./securitychecklist"); 
 const Customer = require('./customer.model')
 
-const customerSecurityChecklist = db.sequelize.define("securityChecklist", {
+const customerSecurityChecklist = db.sequelize.define("CustomerSecurityChecklist", {
     email: {
         type: Sequelize.STRING,
         defaultValue: null

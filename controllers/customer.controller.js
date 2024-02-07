@@ -225,7 +225,13 @@ console.log(newapiPromise,"newapiPromise")
         //return accessToken;
     } catch (error) {
         console.log(error, "000");
-       
+        if(error.message=="Request failed with status code 401"){
+            return res.status(500).json({
+                message: "Your Token is invalid or expired!",
+                error: error.message,
+                status: 500,
+            });
+        }
         return res.status(500).json({
             message: "Internal server error!",
             error: error,
@@ -383,25 +389,37 @@ const addToken = async (req, res) => {
             status: 200
         })
        }
+//        const existingSecurity = await customerSecurityChecklist.findAll({
+//         where: {
+//             [Op.or]: {
+//                 email: req.body.email,
+//                 isDeleted: false
+//             },
+//         },
+//     });
+//     console.log(existingSecurity,"existingSecurity")
+// if(existingSecurity.length == 0){
+//     let securityId = await securityChecklist.findAll();
+//     const uniqueSecurityIds = {};
+//     securityId.forEach(securityId => {
+//         uniqueSecurityIds[securityId.id] = true;
+//     });
+//     for (const id in uniqueSecurityIds) {
+//         let securityPayload = {
+//             email: req.body.email,
+//             securityChecklistId: id
+//         };
+//     let securitycheck = await customerSecurityChecklist.create(securityPayload)
+//     }
+// }
        return res.status(200).json({
         message: "token updated Successfully",
         data: existingUserToken,
         status: 200
     })
-    //    else{
-        
-      
-    //     return res.status(200).json({
-    //         message: "token updated Successfully",
-    //         data: result,
-    //         status: 200
-    //     })
-    //    }
-           // const result = await existingUser.update(req.body);
-           
-        
-       
-         //return accessToken;
+
+
+  
      } catch (error) {
          console.log(error, "000");
          return res.status(500).json({
@@ -491,16 +509,26 @@ const addSecurityChecklist = async (req, res) => {
 
 const getSecurityChecklist = async (req, res) => {
     try {
-        const result = await securityChecklist.findAll({
+        customerSecurityChecklist.belongsTo(securityChecklist, { foreignKey: 'securityChecklistId' });
+        const result = await customerSecurityChecklist.findAll({
             where: {
-                [Op.or]: {
-                    email: req.body.email
-                },
+                email: req.body.email
             },
+            include: [{
+                model: securityChecklist, // Assuming SecurityChecklist is the name of the associated model
+                required: false // Use 'required: false' to perform a LEFT JOIN
+            }],
         });
+        const formattedResult = result.map(item => ({
+            email: item.email,
+            title: item.SecurityChecklist.title,
+            description: item.SecurityChecklist.description,
+            securityid: item.SecurityChecklist.id,
+            status: item.status
+        }));
         return res.status(200).json({
-            message: "token updated Successfully",
-            data: result,
+            message: "security checklist fetched Successfully",
+            data: formattedResult,
             status: 200
         })
     } catch (error) {
@@ -518,8 +546,10 @@ const getSecurityChecklist = async (req, res) => {
 const updateSecurityChecklist = async (req, res) => {
     try {
         let condition = {
-            email: req.body.email,
-            securityChecklistId: req.body.securityChecklistId
+            where: {
+                email: req.body.email,
+                securityChecklistId: req.body.securityChecklistId
+            }
         };
         let payload = {
             status: req.body.status

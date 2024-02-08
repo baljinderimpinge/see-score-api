@@ -490,9 +490,9 @@ const addToken = async (req, res) => {
         const userPayload = {
             email: req.body.email,
             token: req.body.token,
-            expires_in: req.body.expires_in,
-            refresh_token: req.body.refresh_token,
-            tokentimestamp: req.body.tokentimestamp
+            // expires_in: req.body.expires_in,
+            // refresh_token: req.body.refresh_token,
+            // tokentimestamp: req.body.tokentimestamp
         }
         const existingUserToken = await userTokenmodel.findOne({
             where: {

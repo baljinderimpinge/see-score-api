@@ -523,29 +523,29 @@ const addToken = async (req, res) => {
                 status: 200
             })
         }
-        //        const existingSecurity = await customerSecurityChecklist.findAll({
-        //         where: {
-        //             [Op.or]: {
-        //                 email: req.body.email,
-        //                 isDeleted: false
-        //             },
-        //         },
-        //     });
-        //     console.log(existingSecurity,"existingSecurity")
-        // if(existingSecurity.length == 0){
-        //     let securityId = await securityChecklist.findAll();
-        //     const uniqueSecurityIds = {};
-        //     securityId.forEach(securityId => {
-        //         uniqueSecurityIds[securityId.id] = true;
-        //     });
-        //     for (const id in uniqueSecurityIds) {
-        //         let securityPayload = {
-        //             email: req.body.email,
-        //             securityChecklistId: id
-        //         };
-        //     let securitycheck = await customerSecurityChecklist.create(securityPayload)
-        //     }
-        // }
+               const existingSecurity = await customerSecurityChecklist.findAll({
+                where: {
+                    [Op.or]: {
+                        email: req.body.email,
+                        isDeleted: false
+                    },
+                },
+            });
+            console.log(existingSecurity,"existingSecurity")
+        if(existingSecurity.length == 0){
+            let securityId = await securityChecklist.findAll();
+            const uniqueSecurityIds = {};
+            securityId.forEach(securityId => {
+                uniqueSecurityIds[securityId.id] = true;
+            });
+            for (const id in uniqueSecurityIds) {
+                let securityPayload = {
+                    email: req.body.email,
+                    securityChecklistId: id
+                };
+            let securitycheck = await customerSecurityChecklist.create(securityPayload)
+            }
+        }
         return res.status(200).json({
             message: "token updated Successfully",
             data: existingUserToken,

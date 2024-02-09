@@ -12,7 +12,6 @@ const sequelize = new Sequelize("seescore_backend", "postgres", "admin", {
     idle: 10000
   }
 });
-
 const db = {};
 
 db.Sequelize = Sequelize;

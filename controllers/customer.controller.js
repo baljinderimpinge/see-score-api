@@ -155,75 +155,104 @@ const getAllThirdData = async (req, res) => {
     }
 };
 
-const getToken = async (req, res) => {
-    // const tenantId = req.body.tenatId;
 
+const getSecureScores = async (req, res) => {
+    const token = req.body.token
     try {
-        const existingUser = await userTokenmodel.findOne({
-            where: {
+        axios.get(
+            `https://graph.microsoft.com/v1.0/security/secureScores`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
 
-                email: req.body.email,
-                isDeleted: false
-            },
-        });
-        console.log(existingUser, "existingUserexistingUser")
-        if (existingUser) {
-            console.log("-------")
-            const token = existingUser.token;
-
-            const newapiPromise = axios.get(
-                `https://graph.microsoft.com/v1.0/security/secureScores`,
+                },
+            }
+        ).then((data) => {
+            axios.get(
+                `https://graph.microsoft.com/beta/directory/recommendations`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 }
-            );
-            console.log(newapiPromise, "newapiPromise")
-            newapiPromise.then(async (newapi) => {
-                const data = newapi.data;
-                const newdata = data?.value[0]?.controlScores;
+            ).then((result)=>{
+                console.log( data.data.value," data.data.value")
+                        const newdata = data?.data?.value[0]?.controlScores;
                 const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
                 console.log(activeObjects, "activeObjectsactiveObjects")
-                const newapi1 = await axios.get(
-                    `https://graph.microsoft.com/beta/directory/recommendations`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
-                console.log(newapi1, "newapi1newapi1")
-                const activestatus = newapi1.data.value;
+                    const activestatus = result.data.value;
                 const activeObjects1 = activestatus.filter(obj => obj.status === 'active');
-
+        
                 return res.status(200).json({
-                    message: "Data fetched successfully",
+                    message: " fetching data",
                     data: activeObjects,
-                    findingCount: activeObjects1.length,
+                    findingCount:activeObjects1.length,
                     status: 200
                 });
-            }).catch(error => {
-                console.error(error);
-                if (error.message == "Request failed with status code 401") {
-                    return res.status(500).json({
-                        message: "Your Token is invalid or expired!",
-                        error: error.message,
-                        status: 500,
-                    });
-                }
-                return res.status(500).json({
-                    message: "Error fetching data",
+            }).catch((error)=>{
+                return res.status(401).json({
+                    message: "Your account is not authorized!",
                     error: error.message,
-                    status: 500
-                });
+                    status: 401,
+                }); 
+            })
+    
+        }).catch((error) => {
+            return res.status(401).json({
+                message: "Your account is not authorized!",
+                error: error.message,
+                status: 401,
             });
-        }
+        })
+
+        // auth0|65c240c358f141b4ca1d82e1
+        // auth0|65c240c358f141b4ca1d82e1
+        
+        // console.log(newapiPromise, "newapiPromise")
+        // newapiPromise.then(async (newapi) => {
+        //     const data = newapi.data;
+        //     const newdata = data?.value[0]?.controlScores;
+        //     const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
+        //     console.log(activeObjects, "activeObjectsactiveObjects")
+        //     const newapi1 = await axios.get(
+        //         `https://graph.microsoft.com/beta/directory/recommendations`,
+        //         {
+        //             headers: {
+        //                 'Authorization': `Bearer ${token}`,
+        //                 'Content-Type': 'application/json',
+        //             },
+        //         }
+        //     );
+        //     console.log(newapi1, "newapi1newapi1")
+        //     const activestatus = newapi1.data.value;
+        //     const activeObjects1 = activestatus.filter(obj => obj.status === 'active');
+
+        //     return res.status(200).json({
+        //         message: "Data fetched successfully",
+        //         data: activeObjects,
+        //         findingCount: activeObjects1.length,
+        //         status: 200
+        //     });
+        // }).catch(error => {
+        //     console.error(error);
+        //     if (error.message == "Request failed with status code 401") {
+        //         return res.status(500).json({
+        //             message: "Your Token is invalid or expired!",
+        //             error: error.message,
+        //             status: 500,
+        //         });
+        //     }
+        //     return res.status(500).json({
+        //         message: "Error fetching data",
+        //         error: error.message,
+        //         status: 500
+        //     });
+        // });
+        // }
         //return accessToken;
     } catch (error) {
-        console.log(error, "000");
+        // console.log(error, "000");
         if (error.message == "Request failed with status code 401") {
             return res.status(401).json({
                 message: "Your Token is invalid or expired!",
@@ -240,7 +269,7 @@ const getToken = async (req, res) => {
 };
 
 
-const customerToken = async(id)=>{
+const customerToken = async (id) => {
     const tenantId = id;
     const clientId = process.env.CLIENTID;
     const clientSecret = process.env.CLIENTSECRET;
@@ -255,7 +284,7 @@ const customerToken = async(id)=>{
     try {
         const response = await axios.post(
             `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-            requestBody.toString(), 
+            requestBody.toString(),
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -267,8 +296,8 @@ const customerToken = async(id)=>{
         const accessToken = response.data.access_token;
         console.log('Access Token:', accessToken);
         return accessToken;
-        
-       
+
+
 
     } catch (error) {
         console.log(error, "000");
@@ -354,7 +383,7 @@ const customerToken = async(id)=>{
 //             //         status: 500
 //             //     });
 //             // });
-        
+
 //         //return accessToken;
 //     } catch (error) {
 //         console.log(error, "000");
@@ -412,9 +441,9 @@ const getRecomendations = async (req, res) => {
         });
         console.log(existingUser, "existingUserexistingUser")
         if (existingUser) {
-            console.log("-------")
+            // console.log("-------")
             const token = existingUser.dataValues.token;
-            console.log(token, "-------")
+            // console.log(token, "-------")
             const newapi = await axios.get(
                 `https://graph.microsoft.com/beta/directory/recommendations`,
                 {
@@ -483,77 +512,43 @@ const getRecomendations = async (req, res) => {
 };
 
 
-const addToken = async (req, res) => {
+const createAzureToken = async (req, res) => {
+    console.log("createAruretoken")
     try {
         let result;
 
         const userPayload = {
             email: req.body.email,
             token: req.body.token,
-            // expires_in: req.body.expires_in,
+            userId: req.body.userId,
+            expires_in: req.body.expires_in,
             // refresh_token: req.body.refresh_token,
             // tokentimestamp: req.body.tokentimestamp
         }
+
+        // console.log(userPayload, "userPayload")
         const existingUserToken = await userTokenmodel.findOne({
             where: {
-
-                email: req.body.email,
-                isDeleted: false
+                userId: req.body.userId,
+               
             },
         });
 
-
+    // console.log(existingUserToken,"existingUser")
         if (!existingUserToken) {
             result = await userTokenmodel.create(userPayload)
-            //     let update={
-            //         isDeleted:true
-            //     }
-            //     let condition = {
-            //     where: {
-
-            //         email: req.body.email
-            //     }
-            // }
-            //     const result1 = await userTokenmodel.update(update,condition);
-
-            //      result = await userTokenmodel.create(userPayload)
+            await addSecurity(req.body.email)
             return res.status(200).json({
                 message: "token updated Successfully",
                 data: result,
                 status: 200
             })
         }
-               const existingSecurity = await customerSecurityChecklist.findAll({
-                where: {
-                    [Op.or]: {
-                        email: req.body.email,
-                        isDeleted: false
-                    },
-                },
-            });
-            console.log(existingSecurity,"existingSecurity")
-        if(existingSecurity.length == 0){
-            let securityId = await securityChecklist.findAll();
-            const uniqueSecurityIds = {};
-            securityId.forEach(securityId => {
-                uniqueSecurityIds[securityId.id] = true;
-            });
-            for (const id in uniqueSecurityIds) {
-                let securityPayload = {
-                    email: req.body.email,
-                    securityChecklistId: id
-                };
-            let securitycheck = await customerSecurityChecklist.create(securityPayload)
-            }
-        }
         return res.status(200).json({
             message: "token updated Successfully",
             data: existingUserToken,
             status: 200
         })
-
-
-
     } catch (error) {
         console.log(error, "000");
         return res.status(500).json({
@@ -564,6 +559,64 @@ const addToken = async (req, res) => {
     }
 };
 
+
+const addSecurity = async () => {
+    const existingSecurity = await customerSecurityChecklist.findAll({
+        where: {
+            email: req.body.email,
+            isDeleted: false
+        }
+
+    });
+   // console.log(existingSecurity, "existingSecurity")
+    if (existingSecurity.length == 0) {
+        let securityId = await securityChecklist.findAll();
+        const uniqueSecurityIds = {};
+        securityId.forEach(securityId => {
+            uniqueSecurityIds[securityId.id] = true;
+        });
+        for (const id in uniqueSecurityIds) {
+            let securityPayload = {
+                email: req.body.email,
+                securityChecklistId: id
+            };
+            let securitycheck = await customerSecurityChecklist.create(securityPayload)
+            return true
+        }
+    }
+}
+
+const getAzureToken = async (req, res) => {
+    try {
+        const existingUserToken = await userTokenmodel.findOne({
+            where: {
+                userId: req.params.userId,
+            },
+        });
+        console.log(existingUserToken, "kkkkkkkkkkkkkkkkkk")
+        if (existingUserToken) {
+            return res.status(200).json({
+                message: "Data fetched successfully",
+                data: existingUserToken,
+                status: 200
+            });
+        } else {
+            return res.status(200).json({
+                message: "Token  not found",
+                data: [],
+                status: 400
+            });
+        }
+
+    } catch (error) {
+        console.log(error, "000");
+        return res.status(500).json({
+            message: "Internal server error!",
+            error: error,
+            status: 500,
+        });
+    }
+};
 
 const get90daysdata = async (req, res) => {
     // const tenantId = req.body.tenatId;
@@ -710,13 +763,14 @@ module.exports = {
     createUser,
     login,
     getAllThirdData,
-    getToken,
+    getSecureScores,
     getRecomendations,
-    addToken,
+    createAzureToken,
     get90daysdata,
     addSecurityChecklist,
     getSecurityChecklist,
-    updateSecurityChecklist
+    updateSecurityChecklist,
+    getAzureToken
 }
 
 

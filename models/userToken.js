@@ -21,14 +21,16 @@ const UserToken = db.sequelize.define("graphApiTokens", {
         type: Sequelize.INTEGER, // Specifies a date/time
         defaultValue: null
     },
-    // refresh_token:{
-    //     type: Sequelize.STRING(500000), // Adjust the length as needed
-    //     defaultValue: null
-    // },
-    // tokentimestamp:{
-    //     type: Sequelize.DATE, // Specifies a date/time
-    //     defaultValue: null
-    // },
+    refresh_token:{
+        type: Sequelize.STRING(500000), // Adjust the length as needed
+        defaultValue: null
+    },
+
+    tokentimestamp:{
+        type: Sequelize.DATE, // Specifies a date/time
+        defaultValue: null
+    },
+    
     token:{
         type: Sequelize.STRING(500000), // Adjust the length as needed
         defaultValue: null

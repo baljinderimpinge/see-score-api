@@ -15,6 +15,7 @@ const { DefaultAzureCredential } = require("@azure/identity");
 const { Client } = require("@microsoft/microsoft-graph-client");
 
 const axios = require('axios');
+const e = require("express");
 
 const createUser = async (req, res) => {
     let data = req.body;
@@ -516,14 +517,16 @@ const createAzureToken = async (req, res) => {
     console.log("createAruretoken")
     try {
         let result;
-
+// console.log( tokentimestamp: new Date().getTime())
         const userPayload = {
             email: req.body.email,
             token: req.body.token,
             userId: req.body.userId,
             expires_in: req.body.expires_in,
-            // refresh_token: req.body.refresh_token,
-            // tokentimestamp: req.body.tokentimestamp
+            refresh_token: req.body.refresh_token,
+        tokentimestamp:new Date().getTime()
+
+            // tokentimestamp:Math.floor(new Date().getTime()/1000)
         }
 
         // console.log(userPayload, "userPayload")
@@ -560,10 +563,10 @@ const createAzureToken = async (req, res) => {
 };
 
 
-const addSecurity = async () => {
+const addSecurity = async (email) => {
     const existingSecurity = await customerSecurityChecklist.findAll({
         where: {
-            email: req.body.email,
+            email: email,
             isDeleted: false
         }
 
@@ -575,9 +578,10 @@ const addSecurity = async () => {
         securityId.forEach(securityId => {
             uniqueSecurityIds[securityId.id] = true;
         });
+
         for (const id in uniqueSecurityIds) {
             let securityPayload = {
-                email: req.body.email,
+                email: email,
                 securityChecklistId: id
             };
             let securitycheck = await customerSecurityChecklist.create(securityPayload)

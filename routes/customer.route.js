@@ -19,7 +19,7 @@ router.post("/getsecurity",customer.getSecurityChecklist)
 router.put("/updatesecurity",customer.updateSecurityChecklist)
 router.put("/get-azure-token/:userId",customer.updateSecurityChecklist)
 
-
+router.post("/graphdata",customer.get90daysdata)
 
 
 module.exports = router

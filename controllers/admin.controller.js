@@ -671,7 +671,7 @@ const createCustomer = async (req, res) => {
             })
         }
         const tokenapi = await axios.post(
-            `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/oauth/token`,
+            `https://${process.env.AUTH_TOKEN_DOMAIN}/oauth/token`,
                 {
                     "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
                     "client_secret": process.env.AUTH_TOKEN_CLIENT_SECRET,
@@ -691,7 +691,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
         let random = await auth.generateRandomString(12);
         console.log(random,"---=-=-=")
             const newapi = await axios.post(
-                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users`,
+                `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/users`,
                 {
                     "email":req.body.contactEmail,
                     "password":random,
@@ -720,7 +720,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
             let createuser = newapi.data;
             let useremail = createuser.email;
             const passApi = await axios.post(
-                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/dbconnections/change_password`,
+                `https://${process.env.AUTH_TOKEN_DOMAIN}/dbconnections/change_password`,
                 {
                 
                         "client_id":  process.env.AUTH_TOKEN_CLIENT_ID,
@@ -729,6 +729,35 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
                       
                 },
             );
+            const roleApi = await axios.get(
+                `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/roles`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${newtoken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            console.log(roleApi,"-=---=--=-=-")
+           // if(roleApi)
+          let desiredrole = roleApi.data.find(role => role.name === 'Customer');
+          console.log(desiredrole,"00000000")
+           console.log(desiredrole.id)
+           const assignrole = await axios.post(
+            `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/roles/${desiredrole.id}/users`,
+            {
+                users: [createuser.user_id]
+            },
+           
+            {
+                headers: {
+                    'Authorization': `Bearer ${newtoken}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        console.log(assignrole.data);
+
             const userPayload = {
                 email:useremail,
                 name: req.body.contactName,
@@ -764,7 +793,7 @@ const getAllAuthCustomers = async (req, res) => {
     try {
         console.log(req.body,"----")
         const tokenapi = await axios.post(
-            `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/oauth/token`,
+            `https://${process.env.AUTH_TOKEN_DOMAIN}/oauth/token`,
                 {
                     "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
                     "client_secret": process.env.AUTH_TOKEN_CLIENT_SECRET,
@@ -784,7 +813,7 @@ console.log(tokenapi.data.access_token,"tokenapitokenapi")
         let random = await auth.generateRandomString(12);
         console.log(random,"---=-=-=")
             const newapi = await axios.get(
-                `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users`,
+                `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/users`,
                
                 {
                     headers: {

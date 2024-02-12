@@ -92,7 +92,7 @@ const login = async (req, res) => {
         const decoded = await auth.jwtAuthVerify(token, publickey);
         console.log(decoded, "00--");
         const tokenapi = await axios.post(
-            `https://${AUTH_TOKEN_DOMAIN}/oauth/token`,
+            `https://${process.env.AUTH_TOKEN_DOMAIN}/oauth/token`,
             {
                 "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
                 "client_secret": process.env.AUTH_TOKEN_CLIENT_SECRET,
@@ -112,7 +112,7 @@ const login = async (req, res) => {
         let random = await auth.generateRandomString(12);
         console.log(random, "---=-=-=")
         const newapi = await axios.get(
-            `https://${AUTH_TOKEN_DOMAIN}/api/v2/users/${decoded.sub}`,
+            `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/users/${decoded.sub}`,
 
             {
                 headers: {
@@ -125,7 +125,7 @@ const login = async (req, res) => {
         
         let datamain = newapi.data;
         const userrole = await axios.get(
-            `https://${AUTH_TOKEN_DOMAIN}/api/v2/users/${datamain.user_id}/roles`,
+            `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/users/${datamain.user_id}/roles`,
 
             {
                 headers: {
@@ -134,10 +134,11 @@ const login = async (req, res) => {
                 },
             }
         );
-        console.log(newapi.data, "---=-=-=")
-        const roles = userrole.data;
-datamain.roles = roles;
-
+        console.log(userrole.data.length, "---=-=-=")
+        if(userrole.data.length != 0){
+        const roles = userrole.data[0].name;
+datamain.app_metadata.role = roles;
+        }
         return res.status(200).json({
             message: "Login successfully",
             data: datamain,

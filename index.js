@@ -9,7 +9,7 @@ const cors = require('cors')
 // const config = require("./config/nodemon.dev.json")
 const Sequelize = require("sequelize");
 const axios = require('axios');
-// const {cronjonForToken}= require("./common/cronjob")
+const {cronjonForToken}= require("./common/cronjob")
 
 
 // const config = {
@@ -40,4 +40,4 @@ db.sequelize.sync().then(() => {
     console.error('Unable to connect to the database: ', error);
 });
 
-// cronjonForToken.start();
+//cronjonForToken.start();

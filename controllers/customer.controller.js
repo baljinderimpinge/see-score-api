@@ -16,6 +16,7 @@ const { Client } = require("@microsoft/microsoft-graph-client");
 
 const axios = require('axios');
 const e = require("express");
+const { model } = require("mongoose");
 
 const createUser = async (req, res) => {
     let data = req.body;
@@ -91,7 +92,7 @@ const login = async (req, res) => {
         const decoded = await auth.jwtAuthVerify(token, publickey);
         console.log(decoded, "00--");
         const tokenapi = await axios.post(
-            `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/oauth/token`,
+            `https://${AUTH_TOKEN_DOMAIN}/oauth/token`,
             {
                 "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
                 "client_secret": process.env.AUTH_TOKEN_CLIENT_SECRET,
@@ -111,7 +112,7 @@ const login = async (req, res) => {
         let random = await auth.generateRandomString(12);
         console.log(random, "---=-=-=")
         const newapi = await axios.get(
-            `https://dev-3hmsijzw0t7ryxrl.us.auth0.com/api/v2/users/${decoded.sub}`,
+            `https://${AUTH_TOKEN_DOMAIN}/api/v2/users/${decoded.sub}`,
 
             {
                 headers: {
@@ -121,7 +122,22 @@ const login = async (req, res) => {
             }
         );
         console.log(newapi.data, "---=-=-=")
+        
         let datamain = newapi.data;
+        const userrole = await axios.get(
+            `https://${AUTH_TOKEN_DOMAIN}/api/v2/users/${datamain.user_id}/roles`,
+
+            {
+                headers: {
+                    'Authorization': `Bearer ${newtoken}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        console.log(newapi.data, "---=-=-=")
+        const roles = userrole.data;
+datamain.roles = roles;
+
         return res.status(200).json({
             message: "Login successfully",
             data: datamain,
@@ -159,6 +175,7 @@ const getAllThirdData = async (req, res) => {
 
 const getSecureScores = async (req, res) => {
     const token = req.body.token
+const useremail = req.body.email;
     try {
         axios.get(
             `https://graph.microsoft.com/v1.0/security/secureScores`,
@@ -169,6 +186,7 @@ const getSecureScores = async (req, res) => {
                 },
             }
         ).then((data) => {
+            
             axios.get(
                 `https://graph.microsoft.com/beta/directory/recommendations`,
                 {
@@ -177,18 +195,30 @@ const getSecureScores = async (req, res) => {
                         'Content-Type': 'application/json',
                     },
                 }
-            ).then((result)=>{
-                console.log( data.data.value," data.data.value")
+            ).then(async(result)=>{
+                let securityhealthcount = 0;
+                if(useremail){
+                 securityhealthcount = await customerSecurityChecklist.count({
+                    where: {
+                        email: useremail,
+                        status:1
+                    }
+                });
+            }
+               // console.log( data.data.value," data.data.value")
                         const newdata = data?.data?.value[0]?.controlScores;
                 const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
-                console.log(activeObjects, "activeObjectsactiveObjects")
+                //console.log(activeObjects, "activeObjectsactiveObjects")
+                console.log(securityhealthcount,"-=-=-=")
                     const activestatus = result.data.value;
                 const activeObjects1 = activestatus.filter(obj => obj.status === 'active');
+                let overallcount = activeObjects1.length + securityhealthcount;
+               
         
                 return res.status(200).json({
                     message: " fetching data",
                     data: activeObjects,
-                    findingCount:activeObjects1.length,
+                    findingCount:overallcount,
                     status: 200
                 });
             }).catch((error)=>{
@@ -637,6 +667,7 @@ const get90daysdata = async (req, res) => {
         if (existingUser) {
             console.log("-------")
             const token = existingUser.dataValues.token;
+            //const token = req.body.token;
             const currentDate = new Date();
             currentDate.setDate(currentDate.getDate() - 90); // Subtract 90 days from the current date
             const formattedDate = currentDate.toISOString();
@@ -650,13 +681,43 @@ const get90daysdata = async (req, res) => {
                     },
                 }
             );
-            // console.log(newapi, "--0-0-0-")
+        
             let data = newapi.data;
-            let newdata = data?.value[0]?.controlScores;
-            const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
+            let activeObjects = [];
+        
+            console.log(data, "-----");
+        
+            if (data && data.value && Array.isArray(data.value)) {
+                // Iterate over each item in data.value
+                data.value.forEach(item => {
+                    // Extract date from the item
+                    const date = item.createdDateTime;
+                    // Filter controlScores for UserRiskPolicy and add date to each filtered object
+                    const filteredScores = item.controlScores.filter(obj => obj.controlName === 'UserRiskPolicy')
+                        .map(score => ({ ...score, date }));
+                    // Concatenate filteredScores to activeObjects array
+                    activeObjects = activeObjects.concat(filteredScores);
+                });
+            }
+            const filteredData = activeObjects.map(obj => ({
+                date: obj.date,
+                scoreInPercentage: obj.scoreInPercentage
+
+
+            }));
+            const filteredData1 = filteredData.map(obj => ({
+                date: new Date(obj.date).toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric'
+                }),
+                score: obj.scoreInPercentage
+            }));
+            console.log(activeObjects, "=-=-=-");
+        
             return res.status(200).json({
                 message: "Data fetched successfully",
-                data: activeObjects,
+                data: filteredData1,
                 status: 200
             });
         }

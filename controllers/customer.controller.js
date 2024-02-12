@@ -682,7 +682,7 @@ const get90daysdata = async (req, res) => {
                     },
                 }
             );
-        
+        console.log(newapi,"newapi")
             let data = newapi.data;
             let activeObjects = [];
         
@@ -707,15 +707,15 @@ const get90daysdata = async (req, res) => {
 
             }));
             const filteredData1 = filteredData.map(obj => ({
-                date: new Date(obj.date).toLocaleDateString('en-US', {
+                x: new Date(obj.date).toLocaleDateString('en-US', {
                     month: '2-digit',
                     day: '2-digit',
                     year: 'numeric'
                 }),
-                score: obj.scoreInPercentage
+                y: obj.scoreInPercentage
             }));
-            console.log(activeObjects, "=-=-=-");
-        
+            // console.log(filteredData1, "=-=-=-");
+            // console.log()
             return res.status(200).json({
                 message: "Data fetched successfully",
                 data: filteredData1,

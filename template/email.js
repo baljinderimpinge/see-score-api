@@ -1,4 +1,4 @@
-const emailservice = require("../common/email")
+const emailservice = require("../common/email");
 
 async function newaccountPassword(email, password) {
     const subject = "email for forgot password";
@@ -345,11 +345,9 @@ async function newaccountPassword(email, password) {
   </body>
 </html>
     `;
-    await emailservice.sendmail(email,subject,html)
+    await emailservice.sendmail(email, subject, html);
 }
 
-
-
-module.exports={
-    newaccountPassword
-}
+module.exports = {
+    newaccountPassword,
+};

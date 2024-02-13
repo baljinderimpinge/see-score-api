@@ -136,7 +136,7 @@ const login = async (req, res) => {
         );
         console.log(userrole.data.length, "---=-=-=")
         if(userrole.data.length != 0){
-        const roles = userrole.data[0].name;
+        const roles = userrole.data[0].name.trim();
 datamain.app_metadata.role = roles;
         }
         return res.status(200).json({

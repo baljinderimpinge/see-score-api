@@ -23,7 +23,6 @@ const axios = require("axios");
 const e = require("express");
 const { model } = require("mongoose");
 
-<<<<<<< HEAD
 const createUser = async (req, res) => {
     let data = req.body;
     const userSchema = Joi.object({
@@ -92,21 +91,12 @@ const createUser = async (req, res) => {
         });
     }
 };
-=======
-
-
-
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
 
 const login = async (req, res) => {
     try {
         let token = req.body.token;
         console.log(token, "tokentoken")
         let publickey = process.env.PUBLICKEY;
-<<<<<<< HEAD
-        console.log(publickey, "publickeypublickey");
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         const decoded = await auth.jwtAuthVerify(token, publickey);
         const tokenapi = await axios.post(
             `https://${process.env.AUTH_TOKEN_DOMAIN}/oauth/token`,
@@ -123,16 +113,7 @@ const login = async (req, res) => {
                 },
             }
         );
-
         let newtoken = tokenapi.data.access_token;
-<<<<<<< HEAD
-        console.log(tokenapi.data.access_token, "tokenapitokenapi");
-        let random = await auth.generateRandomString(12);
-        console.log(random, "---=-=-=");
-=======
-        console.log(newtoken, "newtokennewtoken")
-        let random = await auth.generateRandomString(12);
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         const newapi = await axios.get(
             `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/users/${decoded.sub}`,
 
@@ -143,11 +124,6 @@ const login = async (req, res) => {
                 },
             }
         );
-<<<<<<< HEAD
-        console.log(newapi.data, "---=-=-=");
-
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         let datamain = newapi.data;
         console.log(datamain, "datamain")
         const userrole = await axios.get(
@@ -160,19 +136,11 @@ const login = async (req, res) => {
                 },
             }
         );
-<<<<<<< HEAD
-        console.log(userrole.data.length, "---=-=-=");
-        if (userrole.data.length != 0) {
-            const roles = userrole.data[0].name.trim();
-            datamain.app_metadata.role = roles;
-=======
-        console.log(userrole.data, "userroleuserrole")
         datamain.role = "";
         if (userrole.data.length != 0) {
             const roles = userrole.data[0].name.trim();
             datamain.role = roles;
             // datamain.app_metadata.role = roles;
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         }
         console.log(datamain, "datamain")
         return res.status(200).json({
@@ -181,11 +149,6 @@ const login = async (req, res) => {
             status: 200,
         });
     } catch (error) {
-<<<<<<< HEAD
-        console.log(error);
-=======
-        console.log(error, "Abcd1234!")
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         return res.status(500).json({
             message: "Internal server error!,",
             error,
@@ -212,11 +175,7 @@ const getAllThirdData = async (req, res) => {
 };
 
 const getSecureScores = async (req, res) => {
-<<<<<<< HEAD
-    const token = req.body.token;
-=======
     const token = req.body.token
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
     const useremail = req.body.email;
     try {
         axios
@@ -224,61 +183,6 @@ const getSecureScores = async (req, res) => {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-<<<<<<< HEAD
-            })
-            .then((data) => {
-                axios
-                    .get(
-                        `https://graph.microsoft.com/beta/directory/recommendations`,
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                                "Content-Type": "application/json",
-                            },
-                        }
-                    )
-                    .then(async (result) => {
-                        let securityhealthcount = 0;
-                        if (useremail) {
-                            securityhealthcount =
-                                await customerSecurityChecklist.count({
-                                    where: {
-                                        email: useremail,
-                                        status: 1,
-                                    },
-                                });
-                        }
-                        // console.log( data.data.value," data.data.value")
-                        const newdata = data?.data?.value[0]?.controlScores;
-                        const activeObjects = newdata?.filter(
-                            (obj) => obj.controlName === "UserRiskPolicy"
-                        );
-                        //console.log(activeObjects, "activeObjectsactiveObjects")
-                        console.log(securityhealthcount, "-=-=-=");
-                        const activestatus = result.data.value;
-                        const activeObjects1 = activestatus.filter(
-                            (obj) => obj.status === "active"
-                        );
-                        let overallcount =
-                            activeObjects1.length + securityhealthcount;
-
-                        return res.status(200).json({
-                            message: " fetching data",
-                            data: activeObjects,
-                            findingCount: overallcount,
-                            status: 200,
-                        });
-                    })
-                    .catch((error) => {
-                        return res.status(401).json({
-                            message: "Your account is not authorized!",
-                            error: error.message,
-                            status: 401,
-                        });
-                    });
-            })
-            .catch((error) => {
-=======
             }
         ).then((data) => {
 
@@ -312,61 +216,11 @@ const getSecureScores = async (req, res) => {
                     status: 200
                 });
             }).catch((error) => {
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
                 return res.status(401).json({
                     message: "Your account is not authorized!",
                     error: error.message,
                     status: 401,
                 });
-<<<<<<< HEAD
-            });
-
-        // auth0|65c240c358f141b4ca1d82e1
-        // auth0|65c240c358f141b4ca1d82e1
-
-        // console.log(newapiPromise, "newapiPromise")
-        // newapiPromise.then(async (newapi) => {
-        //     const data = newapi.data;
-        //     const newdata = data?.value[0]?.controlScores;
-        //     const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
-        //     console.log(activeObjects, "activeObjectsactiveObjects")
-        //     const newapi1 = await axios.get(
-        //         `https://graph.microsoft.com/beta/directory/recommendations`,
-        //         {
-        //             headers: {
-        //                 'Authorization': `Bearer ${token}`,
-        //                 'Content-Type': 'application/json',
-        //             },
-        //         }
-        //     );
-        //     console.log(newapi1, "newapi1newapi1")
-        //     const activestatus = newapi1.data.value;
-        //     const activeObjects1 = activestatus.filter(obj => obj.status === 'active');
-
-        //     return res.status(200).json({
-        //         message: "Data fetched successfully",
-        //         data: activeObjects,
-        //         findingCount: activeObjects1.length,
-        //         status: 200
-        //     });
-        // }).catch(error => {
-        //     console.error(error);
-        //     if (error.message == "Request failed with status code 401") {
-        //         return res.status(500).json({
-        //             message: "Your Token is invalid or expired!",
-        //             error: error.message,
-        //             status: 500,
-        //         });
-        //     }
-        //     return res.status(500).json({
-        //         message: "Error fetching data",
-        //         error: error.message,
-        //         status: 500
-        //     });
-        // });
-        // }
-        //return accessToken;
-=======
             })
 
         }).catch((error) => {
@@ -376,7 +230,6 @@ const getSecureScores = async (req, res) => {
                 status: 401,
             });
         })
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
     } catch (error) {
         if (error.message == "Request failed with status code 401") {
             return res.status(401).json({
@@ -418,158 +271,23 @@ const customerToken = async (id) => {
 
         // Access the token from the response
         const accessToken = response.data.access_token;
-<<<<<<< HEAD
-        console.log("Access Token:", accessToken);
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         return accessToken;
     } catch (error) {
         return error;
     }
 };
 
-<<<<<<< HEAD
-// const getToken = async (req, res) => {
-//     // const tenantId = req.body.tenatId;
-//     // const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
-//     //  const token = req.body.token;
-//     // const tenantId = req.body.tenantID;
-//     // const clientId = process.env.CLIENTID;
-//     // const clientSecret = process.env.CLIENTSECRET;
-//     // const scope = process.env.SCOPE;
-//     // const grantType = process.env.GRANT_TYPE;
-
-//     // const requestBody = new URLSearchParams();
-//     // requestBody.append('client_id', clientId);
-//     // requestBody.append('client_secret', clientSecret);
-//     // requestBody.append('scope', scope);
-//     // requestBody.append('grant_type', grantType);
-//  const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
-
-//     try {
-//         console.log(tenantId,"tenantId")
-//         const token = await customerToken(tenantId)
-//      console.log(token,"--------")
-//             const newapiPromise =await axios.get(
-//                 `https://graph.microsoft.com/v1.0/security/secureScores`,
-//                 {
-//                     headers: {
-//                         'Authorization': `Bearer ${token}`,
-//                         'Content-Type': 'application/json',
-//                     },
-//                 }
-//             );
-//             console.log(newapiPromise.data, "newapiPromise")
-//                 return res.status(200).json({
-//                     message: "Data fetched successfully",
-//                     data: newapiPromise.data,
-//                     status: 200
-//                 });
-//             // newapiPromise.then(async (newapi) => {
-//             //     const data = newapi.data;
-//             //     const newdata = data?.value[0]?.controlScores;
-//             //     const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
-//             //     console.log(activeObjects, "activeObjectsactiveObjects")
-//             //     const newapi1 = await axios.get(
-//             //         `https://graph.microsoft.com/beta/directory/recommendations`,
-//             //         {
-//             //             headers: {
-//             //                 'Authorization': `Bearer ${token}`,
-//             //                 'Content-Type': 'application/json',
-//             //             },
-//             //         }
-//             //     );
-//             //     console.log(newapi1, "newapi1newapi1")
-//             //     const activestatus = newapi1.data.value;
-//             //     const activeObjects1 = activestatus.filter(obj => obj.status === 'active');
-
-//             //     return res.status(200).json({
-//             //         message: "Data fetched successfully",
-//             //         data: activeObjects,
-//             //         findingCount: activeObjects1.length,
-//             //         status: 200
-//             //     });
-//             // }).catch(error => {
-//             //     console.error(error);
-//             //     if (error.message == "Request failed with status code 401") {
-//             //         return res.status(500).json({
-//             //             message: "Your Token is invalid or expired!",
-//             //             error: error.message,
-//             //             status: 500,
-//             //         });
-//             //     }
-//             //     return res.status(500).json({
-//             //         message: "Error fetching data",
-//             //         error: error.message,
-//             //         status: 500
-//             //     });
-//             // });
-
-//         //return accessToken;
-//     } catch (error) {
-//         console.log(error, "000");
-//         if (error.message == "Request failed with status code 401") {
-//             return res.status(401).json({
-//                 message: "Your Token is invalid or expired!",
-//                 error: error.message,
-//                 status: 401,
-//             });
-//         }
-//         return res.status(500).json({
-//             message: "Internal server error!",
-//             error: error,
-//             status: 500,
-//         });
-//     }
-// };
-
-const getRecomendations = async (req, res) => {
-    // const tenantId = "4cda6fa4-1377-4e12-827a-362a904d8b84";
-    //  const token = req.body.token;
-    // const tenantId = req.body.tenantID;
-    // const clientId = process.env.CLIENTID;
-    // const clientSecret = process.env.CLIENTSECRET;
-    // const scope = process.env.SCOPE;
-    // const grantType = process.env.GRANT_TYPE;
-
-    // const requestBody = new URLSearchParams();
-    // requestBody.append('client_id', clientId);
-    // requestBody.append('client_secret', clientSecret);
-    // requestBody.append('scope', scope);
-    // requestBody.append('grant_type', grantType);
-=======
 
 
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
 
 const getRecomendations = async (req, res) => {
     try {
-<<<<<<< HEAD
-        // const response = await axios.post(
-        //     `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-        //     requestBody.toString(),
-        //     {
-        //         headers: {
-        //             'Content-Type': 'application/x-www-form-urlencoded',
-        //         },
-        //     }
-        // );
-
-        // // Access the token from the response
-        // const accessToken = response.data.access_token;
-        // console.log('Access Token:', accessToken);
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         const existingUser = await userTokenmodel.findOne({
             where: {
                 email: req.body.email,
                 isDeleted: false,
             },
         });
-<<<<<<< HEAD
-        console.log(existingUser, "existingUserexistingUser");
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         if (existingUser) {
             const token = existingUser.dataValues.token;
             const newapi = await axios.get(
@@ -581,18 +299,8 @@ const getRecomendations = async (req, res) => {
                     },
                 }
             );
-<<<<<<< HEAD
-            console.log(newapi, "--0-0-0-");
-            let activestatus = newapi.data.value;
-            const activeObjects = activestatus.filter(
-                (obj) => obj.status === "active"
-            );
-            console.log(activeObjects, "activeObjects");
-
-=======
             let activestatus = newapi.data.value;
             const activeObjects = activestatus.filter(obj => obj.status === 'active');
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
             if (req.query.id) {
                 let checkid = req.query.id;
                 let datasend = activeObjects.filter(
@@ -605,37 +313,23 @@ const getRecomendations = async (req, res) => {
                     insights: obj.insights,
                     benefits: obj.benefits,
                     actionSteps: obj.actionSteps,
-<<<<<<< HEAD
-                    actionURL: obj.actionURL,
-=======
                     actionURL: obj.actionURL
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
                 }));
                 return res.status(200).json({
                     message: "Data fetched successfully",
                     data: filteredData,
                     status: 200,
                 });
-<<<<<<< HEAD
-            } else {
-                // let data = activeObjects;
-                const filteredData = activeObjects.map((obj) => ({
-=======
             }
             else {
                 const filteredData = activeObjects.map(obj => ({
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
                     id: obj.id,
                     displayName: obj.displayName,
                     priority: obj.priority,
                     insights: obj.insights,
                     benefits: obj.benefits,
                     actionSteps: obj.actionSteps,
-<<<<<<< HEAD
-                    actionURL: obj.actionURL,
-=======
                     actionURL: obj.actionURL
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
                 }));
                 return res.status(200).json({
                     message: "Data fetched successfully",
@@ -654,36 +348,14 @@ const getRecomendations = async (req, res) => {
 };
 
 const createAzureToken = async (req, res) => {
-<<<<<<< HEAD
-    console.log("createAruretoken");
     try {
         let result;
-        // console.log( tokentimestamp: new Date().getTime())
-=======
-    try {
-        let result;
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         const userPayload = {
             email: req.body.email,
             token: req.body.token,
             userId: req.body.userId,
             expires_in: req.body.expires_in,
             refresh_token: req.body.refresh_token,
-<<<<<<< HEAD
-            tokentimestamp: new Date().getTime(),
-
-            // tokentimestamp:Math.floor(new Date().getTime()/1000)
-        };
-
-        // console.log(userPayload, "userPayload")
-        const existingUserToken = await userTokenmodel.findOne({
-            where: {
-                userId: req.body.userId,
-            },
-        });
-
-        // console.log(existingUserToken,"existingUser")
-=======
             tokentimestamp: new Date().getTime()
         }
         const existingUserToken = await userTokenmodel.findOne({
@@ -692,7 +364,6 @@ const createAzureToken = async (req, res) => {
 
             },
         });
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         if (!existingUserToken) {
             result = await userTokenmodel.create(userPayload);
             await addSecurity(req.body.email);
@@ -723,10 +394,6 @@ const addSecurity = async (email) => {
             isDeleted: false,
         },
     });
-<<<<<<< HEAD
-    // console.log(existingSecurity, "existingSecurity")
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
     if (existingSecurity.length == 0) {
         let securityId = await securityChecklist.findAll();
         const uniqueSecurityIds = {};
@@ -754,10 +421,6 @@ const getAzureToken = async (req, res) => {
                 userId: req.params.userId,
             },
         });
-<<<<<<< HEAD
-        console.log(existingUserToken, "kkkkkkkkkkkkkkkkkk");
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         if (existingUserToken) {
             return res.status(200).json({
                 message: "Data fetched successfully",
@@ -788,21 +451,11 @@ const get90daysdata = async (req, res) => {
                 isDeleted: false,
             },
         });
-<<<<<<< HEAD
-        console.log(existingUser, "existingUserexistingUser");
         if (existingUser) {
-            console.log("-------");
-=======
-        if (existingUser) {
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
             const token = existingUser.dataValues.token;
             const currentDate = new Date();
             currentDate.setDate(currentDate.getDate() - 90); // Subtract 90 days from the current date
             const formattedDate = currentDate.toISOString();
-<<<<<<< HEAD
-            console.log(token, "-------");
-=======
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
             const newapi = await axios.get(
                 `https://graph.microsoft.com/v1.0/security/secureScores?$filter=createdDateTime ge ${formattedDate}`,
                 {
@@ -812,24 +465,6 @@ const get90daysdata = async (req, res) => {
                     },
                 }
             );
-<<<<<<< HEAD
-            console.log(newapi, "newapi");
-            let data = newapi.data;
-            let activeObjects = [];
-
-            console.log(data, "-----");
-
-            if (data && data.value && Array.isArray(data.value)) {
-                // Iterate over each item in data.value
-                data.value.forEach((item) => {
-                    // Extract date from the item
-                    const date = item.createdDateTime;
-                    // Filter controlScores for UserRiskPolicy and add date to each filtered object
-                    const filteredScores = item.controlScores
-                        .filter((obj) => obj.controlName === "UserRiskPolicy")
-                        .map((score) => ({ ...score, date }));
-                    // Concatenate filteredScores to activeObjects array
-=======
             let data = newapi.data;
             let activeObjects = [];
             if (data && data.value && Array.isArray(data.value)) {
@@ -837,17 +472,12 @@ const get90daysdata = async (req, res) => {
                     const date = item.createdDateTime;
                     const filteredScores = item.controlScores.filter(obj => obj.controlName === 'UserRiskPolicy')
                         .map(score => ({ ...score, date }));
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
                     activeObjects = activeObjects.concat(filteredScores);
                 });
             }
             const filteredData = activeObjects.map((obj) => ({
                 date: obj.date,
-<<<<<<< HEAD
-                scoreInPercentage: obj.scoreInPercentage,
-=======
                 scoreInPercentage: obj.scoreInPercentage
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
             }));
             const filteredData1 = filteredData.map((obj) => ({
                 x: new Date(obj.date).toLocaleDateString("en-US", {
@@ -904,19 +534,10 @@ const getSecurityChecklist = async (req, res) => {
             where: {
                 email: req.body.email,
             },
-<<<<<<< HEAD
-            include: [
-                {
-                    model: securityChecklist, // Assuming SecurityChecklist is the name of the associated model
-                    required: false, // Use 'required: false' to perform a LEFT JOIN
-                },
-            ],
-=======
             include: [{
                 model: securityChecklist,
                 required: false
             }],
->>>>>>> 26fc265a23c765bd120492976b6db99060ce7eae
         });
         const formattedResult = result.map((item) => ({
             email: item.email,

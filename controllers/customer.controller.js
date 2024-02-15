@@ -70,13 +70,11 @@ const createUser = async (req, res) => {
                 isEmailVerify: true,
             };
             const result = await userModel.create(payload);
-            console.log(result, "gggggggggggggg");
             const token = await auth.jwtSign({
                 _id: result._id,
                 role: result.role,
                 email: result.role,
             });
-            console.log(result, "gggggggggggggg");
             return res.status(200).json({
                 message: "user created Successfully",
                 data: { user: result, token },
@@ -95,7 +93,6 @@ const createUser = async (req, res) => {
 const login = async (req, res) => {
     try {
         let token = req.body.token;
-        console.log(token, "tokentoken")
         let publickey = process.env.PUBLICKEY;
         const decoded = await auth.jwtAuthVerify(token, publickey);
         const tokenapi = await axios.post(
@@ -125,7 +122,6 @@ const login = async (req, res) => {
             }
         );
         let datamain = newapi.data;
-        console.log(datamain, "datamain")
         const userrole = await axios.get(
             `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/users/${datamain.user_id}/roles`,
 
@@ -142,7 +138,6 @@ const login = async (req, res) => {
             datamain.role = roles;
             // datamain.app_metadata.role = roles;
         }
-        console.log(datamain, "datamain")
         return res.status(200).json({
             message: "Login successfully",
             data: datamain,
@@ -603,9 +598,4 @@ module.exports = {
     getAzureToken,
 };
 
-// { item&&item.actionSteps.length>0 && item.actionSteps((item,index)=>{
-//     return(<>
-// <br /> 1. Assign more than one user a global administrator role in your organization. Go to Microsoft Entra ID {">"} Roles and administrators and select the Global administrator role in the table. Then click Add assignments.</p>
-//    </>
-//    )
-// })}
+

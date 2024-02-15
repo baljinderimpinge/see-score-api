@@ -42,7 +42,6 @@ module.exports.cronjonForToken = cron.schedule('*/10 * * * * *', async () => {
                         },
                     }
                 );
-                console.log(response.data,"--=-=-=-")
                let newtoken= response.data.access_token;
                let condition = {
                 where: {

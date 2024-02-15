@@ -9,18 +9,16 @@ var router = express.Router();
 var fetch = require('../common/fetch');
 
 var { GRAPH_ME_ENDPOINT } = require('../common/authConfig');
-
-// custom middleware to check auth state
 function isAuthenticated(req, res, next) {
     if (!req.session.isAuthenticated) {
-        return res.redirect('/auth/signin'); // redirect to sign-in route
+        return res.redirect('/auth/signin'); 
     }
 
     next();
 };
 
 router.get('/id',
-    isAuthenticated, // check if user is authenticated
+    isAuthenticated, 
     async function (req, res, next) {
         console.log(req.session.account,"req.session.account")
         res.render('id', { idTokenClaims: req.session.account.idTokenClaims });
@@ -28,7 +26,7 @@ router.get('/id',
 );
 
 router.get('/profile',
-    isAuthenticated, // check if user is authenticated
+    isAuthenticated, 
     async function (req, res, next) {
         try {
             const graphResponse = await fetch(GRAPH_ME_ENDPOINT, req.session.accessToken);

@@ -16,7 +16,6 @@ pass: process.env.EMAIL_PASSWORD
 });
 
 const  sendmail = async(to, subject, message) => {
-    console.log("reacheddd",to);
     let email = await transporter.sendMail({
         from: process.env.EMAIL_USERNAME,
         to:to,

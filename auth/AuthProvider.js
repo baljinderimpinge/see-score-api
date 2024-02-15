@@ -67,7 +67,6 @@ class AuthProvider {
             }
 
             const msalInstance = this.getMsalInstance(this.msalConfig);
-            console.log(msalInstance, "----")
             // trigger the first leg of auth code flow
             return this.redirectToAuthCodeUrl(
                 authCodeUrlRequestParams,
@@ -88,7 +87,6 @@ class AuthProvider {
                  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-node/docs/caching.md
                  */
                 if (req.session.tokenCache) {
-                    console.log(req.session.tokenCache, "req.session.tokenCache")
                     msalInstance.getTokenCache().deserialize(req.session.tokenCache);
                 }
 
@@ -124,55 +122,43 @@ class AuthProvider {
 
     handleRedirect(options = {}) {
         return async (req, res, next) => {
-             //console.log(req,"--=-=-")
-             console.log(req.params,"-=-=-=-")
-            console.log(req.body,"req.body")
             if (!req.body || !req.body.state) {
                 return next(new Error('Error: response not found'));
             }
-console.log("hererererere")
-const state = JSON.parse(this.cryptoProvider.base64Decode(req.body.state));
-const authid = state.authid;
-console.log(authid,"authid")
+            const state = JSON.parse(this.cryptoProvider.base64Decode(req.body.state));
+            const authid = state.authid;
             const authCodeRequest = {
                 ...req.session.authCodeRequest,
                 code: req.body.code,
                 codeVerifier: req.session.pkceCodes.verifier,
             };
-
-
-            console.log(authCodeRequest,"authCodeRequestauthCodeRequest")
-
             try {
                 const msalInstance = this.getMsalInstance(this.msalConfig);
 
                 if (req.session.tokenCache) {
-                    console.log(req.session.tokenCache, "req.session.tokenCache")
                     msalInstance.getTokenCache().deserialize(req.session.tokenCache);
                 }
 
                 const tokenResponse = await msalInstance.acquireTokenByCode(authCodeRequest, req.body);
-                console.log(tokenResponse, "--===11111111-=-=")
-               let freshrefreshtoken;
+
+                let freshrefreshtoken;
                 const refreshToken = () => {
                     const tokenCache = msalInstance.getTokenCache().serialize();
                     const refreshTokenObject = (JSON.parse(tokenCache)).RefreshToken
                     const refreshToken = refreshTokenObject[Object.keys(refreshTokenObject)[0]].secret;
-                    console.log(refreshToken, "refreshTokenref222222reshTokenrefreshToken")
-                    freshrefreshtoken=refreshToken;
+
+                    freshrefreshtoken = refreshToken;
                     return refreshToken;
                 }
-                console.log(refreshToken(), "-=-=-=")
                 //const expiresDiff = tokenResponse?.extExpiresOn.getTime()-tokenResponse?.expiresOn.getTime()
                 let expiresDiff = Math.floor((new Date(tokenResponse.expiresOn).getTime() - new Date().getTime()) / 1000);
-console.log(expiresDiff,"expiresDiff")
                 let userPayload = {
                     userId: authid,
-                    email:tokenResponse.account.username,
-                    expires_in:expiresDiff,
-                    refresh_token:freshrefreshtoken,
-                    token:tokenResponse.accessToken,
-                    tokentimestamp:new Date().getTime()
+                    email: tokenResponse.account.username,
+                    expires_in: expiresDiff,
+                    refresh_token: freshrefreshtoken,
+                    token: tokenResponse.accessToken,
+                    tokentimestamp: new Date().getTime()
                 }
                 await userTokenmodel.create(userPayload)
                 req.session.tokenCache = msalInstance.getTokenCache().serialize();
@@ -183,7 +169,6 @@ console.log(expiresDiff,"expiresDiff")
                 const state = JSON.parse(this.cryptoProvider.base64Decode(req.body.state));
                 res.redirect(process.env.FRONT_URL);
             } catch (error) {
-                console.log(error,"-=-=-==-errorr")
                 next(error);
             }
         }
@@ -228,7 +213,7 @@ console.log(expiresDiff,"expiresDiff")
      * @param authCodeRequestParams: parameters for requesting tokens using auth code
      */
     redirectToAuthCodeUrl(authCodeUrlRequestParams, authCodeRequestParams, msalInstance) {
-        console.log("=-=-=--")
+
         return async (req, res, next) => {
             // Generate PKCE Codes before starting the authorization flow
             const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
@@ -252,15 +237,13 @@ console.log(expiresDiff,"expiresDiff")
                 codeChallenge: req.session.pkceCodes.challenge,
                 codeChallengeMethod: req.session.pkceCodes.challengeMethod,
             };
-console.log(req.session.authCodeUrlRequest,"req.session.authCodeUrlRequest")
             req.session.authCodeRequest = {
                 ...authCodeRequestParams,
                 code: '',
             };
-console.log(req.session.authCodeRequest,"req.session.authCodeRequest")
             try {
                 const authCodeUrlResponse = await msalInstance.getAuthCodeUrl(req.session.authCodeUrlRequest);
-                console.log(authCodeUrlResponse, "authCodeUrlResponse")
+
                 res.redirect(authCodeUrlResponse);
                 // return res.status(200).json({
                 //     message: "Data fetched successfully",
@@ -305,7 +288,6 @@ console.log(req.session.authCodeRequest,"req.session.authCodeRequest")
             const response = await axios.get(endpoint);
             return await response.data;
         } catch (error) {
-            console.log(error);
         }
     }
 }

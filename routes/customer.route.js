@@ -14,7 +14,7 @@ router.post("/recomen",customer.getRecomendations)
 
 router.post("/security",customer.addSecurityChecklist)
 router.post("/getsecurity",customer.getSecurityChecklist)
-router.put("/updatesecurity",customer.updateSecurityChecklist)
+router.post("/updatesecurity",customer.updateSecurityChecklist)
 
 router.post("/graphdata",customer.get90daysdata)
 

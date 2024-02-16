@@ -8,6 +8,8 @@ module.exports.cronjonForToken = cron.schedule('*/10 * * * * *', async () => {
     console.log("------------")
     let current_time_stamp = new Date().getTime();
     let userTokenData = await userTokenmodel.findAll();
+    console.log(userTokenData.length,"userTokenData")
+    if(userTokenData.length>0){
     userTokenData.forEach(async (userToken) => {
         let tokentimestamp = userToken.tokentimestamp.getTime();;
         let expires_in = userToken.expires_in * 1000;
@@ -61,12 +63,13 @@ module.exports.cronjonForToken = cron.schedule('*/10 * * * * *', async () => {
             } else {
                 console.log(`No entry found with ID ${userToken.id}.`);
             }
-
-            } catch (error) {
+        }
+            catch (error) {
                 console.error('Error refreshing token:', error);
                 // Handle error
             }
         }
     });
+}
     console.log('running a task after 10 seconds');
 });

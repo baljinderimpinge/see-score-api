@@ -558,18 +558,19 @@ const getSecurityChecklist = async (req, res) => {
 
 const updateSecurityChecklist = async (req, res) => {
     try {
-        let condition = {
-            where: {
-                email: req.body.email,
-                securityChecklistId: req.body.securityChecklistId,
-            },
-        };
+        // let condition = {
+        //     where: {
+        //         email: req.body.email,
+        //         securityChecklistId: req.body.securityChecklistId,
+        //     },
+        // };
         let payload = {
+            email: req.body.email,
+                 securityChecklistId: req.body.securityChecklistId,
             status: req.body.status,
         };
-        let security = await customerSecurityChecklist.update(
-            payload,
-            condition
+        let security = await customerSecurityChecklist.create(
+            payload
         );
         return res.status(200).json({
             message: "token updated Successfully",
@@ -584,6 +585,10 @@ const updateSecurityChecklist = async (req, res) => {
         });
     }
 };
+
+
+
+
 
 module.exports = {
     login,

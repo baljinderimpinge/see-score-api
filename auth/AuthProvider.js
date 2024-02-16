@@ -6,29 +6,34 @@ const { msalConfig } = require('../common/authConfig');
 
 
 const addSecurity = async (email) => {
+    console.log(email, "-==-=--===-=")
     const existingSecurity = await customerSecurityChecklist.findAll({
         where: {
             email: email,
             isDeleted: false
         }
-
     });
-   // console.log(existingSecurity, "existingSecurity")
+    console.log(existingSecurity, "existingSecurity")
     if (existingSecurity.length == 0) {
-        let securityId = await securityChecklist.findAll();
+        let securityIds = await securityChecklist.findAll();
         const uniqueSecurityIds = {};
-        securityId.forEach(securityId => {
+        securityIds.forEach(securityId => {
             uniqueSecurityIds[securityId.id] = true;
         });
 
+        const promises = []; // Array to store promises for all created entries
         for (const id in uniqueSecurityIds) {
             let securityPayload = {
                 email: email,
                 securityChecklistId: id
             };
-            let securitycheck = await customerSecurityChecklist.create(securityPayload)
-            return true
+            promises.push(customerSecurityChecklist.create(securityPayload));
         }
+
+        // Wait for all entries to be created
+        await Promise.all(promises);
+
+        return true;
     }
 }
 
@@ -178,10 +183,9 @@ class AuthProvider {
                     const refreshToken = refreshTokenObject[Object.keys(refreshTokenObject)[0]].secret;
 
                     freshrefreshtoken = refreshToken;
-                    console.log(freshrefreshtoken,"freshref-----reshtoken")
                     return refreshToken;
                 }
-                console.log(freshrefreshtoken,"freshrefreshtoken")
+                console.log(refreshToken(), "-=-=-=") // this is mandatory
                 //const expiresDiff = tokenResponse?.extExpiresOn.getTime()-tokenResponse?.expiresOn.getTime()
                 let expiresDiff = Math.floor((new Date(tokenResponse.expiresOn).getTime() - new Date().getTime()) / 1000);
                 let userPayload = {

@@ -18,5 +18,5 @@ router.post("/updatesecurity",customer.updateSecurityChecklist)
 
 router.post("/graphdata",customer.get90daysdata)
 
-
+router.post("/changepassword",customer.changepassword)
 module.exports = router

@@ -446,57 +446,78 @@ const get90daysdata = async (req, res) => {
                 isDeleted: false,
             },
         });
-        if (existingUser) {
-            const token = existingUser.dataValues.token;
-            const currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() - 90); // Subtract 90 days from the current date
-            const formattedDate = currentDate.toISOString();
-            const newapi = await axios.get(
-                `https://graph.microsoft.com/v1.0/security/secureScores?$filter=createdDateTime ge ${formattedDate}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-            let data = newapi.data;
-            let activeObjects = [];
-            if (data && data.value && Array.isArray(data.value)) {
-                data.value.forEach(item => {
-                    const date = item.createdDateTime;
-                    const filteredScores = item.controlScores.filter(obj => obj.controlName === 'UserRiskPolicy')
-                        .map(score => ({ ...score, date }));
-                    activeObjects = activeObjects.concat(filteredScores);
-                });
-            }
-            const filteredData = activeObjects.map((obj) => ({
-                date: obj.date,
-                scoreInPercentage: obj.scoreInPercentage
-            }));
-            const filteredData1 = filteredData.map((obj) => ({
-                x: new Date(obj.date).toLocaleDateString("en-US", {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                }),
-                y: obj.scoreInPercentage,
-            }));
-            return res.status(200).json({
-                message: "Data fetched successfully",
-                data: filteredData1,
-                status: 200,
-                last_update: filteredData1[0].x,
+
+        if (!existingUser) {
+            return res.status(404).json({
+                message: "User not found",
+                status: 404,
             });
         }
+
+        const token = existingUser.token;
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() - 90); // Subtract 90 days from the current date
+        const formattedDate = currentDate.toISOString();
+
+        const newapi = await axios.get(
+            `https://graph.microsoft.com/v1.0/security/secureScores?$filter=createdDateTime ge ${formattedDate}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const data = newapi.data;
+        let activeObjects = [];
+
+        if (data && data.value && Array.isArray(data.value)) {
+            data.value.forEach(item => {
+                const date = new Date(item.createdDateTime);
+                const filteredScores = item.controlScores.filter(obj => obj.controlName === 'UserRiskPolicy')
+                    .map(score => ({ ...score, date }));
+                activeObjects = activeObjects.concat(filteredScores);
+            });
+        }
+
+        const filteredData = activeObjects.map((obj) => ({
+            date: obj.date,
+            scoreInPercentage: obj.scoreInPercentage
+        }));
+
+        const filteredData1 = filteredData.map((obj) => {
+            const australiaDate = new Date(obj.date);
+            const australiaOptions = {
+                timeZone: 'Australia/Sydney',
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric"
+            };
+
+            const formattedDate = australiaDate.toLocaleDateString("en-US", australiaOptions);
+
+            return {
+                x: formattedDate,
+                y: obj.scoreInPercentage
+            };
+        });
+
+        return res.status(200).json({
+            message: "Data fetched successfully",
+            data: filteredData1,
+            status: 200,
+            last_update: filteredData1.length > 0 ? filteredData1[0].x : null,
+        });
     } catch (error) {
         return res.status(500).json({
             message: "Internal server error!",
-            error: error,
+            error: error.message,
             status: 500,
         });
     }
 };
+
 
 const addSecurityChecklist = async (req, res) => {
     try {
@@ -558,19 +579,18 @@ const getSecurityChecklist = async (req, res) => {
 
 const updateSecurityChecklist = async (req, res) => {
     try {
-        // let condition = {
-        //     where: {
-        //         email: req.body.email,
-        //         securityChecklistId: req.body.securityChecklistId,
-        //     },
-        // };
+        let condition = {
+            where: {
+                email: req.body.email,
+                securityChecklistId: req.body.securityChecklistId,
+            },
+        };
         let payload = {
-            email: req.body.email,
-                 securityChecklistId: req.body.securityChecklistId,
             status: req.body.status,
         };
-        let security = await customerSecurityChecklist.create(
-            payload
+        let security = await customerSecurityChecklist.update(
+            payload,
+            condition
         );
         return res.status(200).json({
             message: "token updated Successfully",
@@ -588,7 +608,39 @@ const updateSecurityChecklist = async (req, res) => {
 
 
 
+const changepassword = async (req, res) => {
+    try {
+        if (req.body.contactEmail == "") {
+            return res.status(500).json({
+                message: "please enter a user email",
+                status: 500,
+            })
+        }
+        let useremail = req.body.email;
+        const passApi = await axios.post(
+            `https://${process.env.AUTH_TOKEN_DOMAIN}/dbconnections/change_password`,
+            {
 
+                "client_id": process.env.AUTH_TOKEN_CLIENT_ID,
+                "email": useremail,
+                "connection": "Username-Password-Authentication"
+
+            },
+        );
+        return res.status(200).json({
+            message: "Email for reset your password has been sent",
+            status: 200
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error!,",
+            error: "AxiosError",
+            status: 500,
+
+        })
+    }
+
+}
 
 module.exports = {
     login,
@@ -601,6 +653,7 @@ module.exports = {
     getSecurityChecklist,
     updateSecurityChecklist,
     getAzureToken,
+    changepassword
 };
 
 

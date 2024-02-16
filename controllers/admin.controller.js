@@ -1,5 +1,6 @@
 
-const { userModel, subscriptionModel } = require("../models")
+const { userModel, subscriptionModel, securityChecklist,
+    customerSecurityChecklist, } = require("../models")
 const { Op } = require("sequelize");
 const Joi = require("joi")
 const bcrypt = require("bcrypt")
@@ -76,6 +77,32 @@ const createUser = async (req, res) => {
 
 }
 
+const addSecurity = async (email) => {
+    const existingSecurity = await customerSecurityChecklist.findAll({
+        where: {
+            email: email,
+            isDeleted: false
+        }
+
+    });
+   // console.log(existingSecurity, "existingSecurity")
+    if (existingSecurity.length == 0) {
+        let securityId = await securityChecklist.findAll();
+        const uniqueSecurityIds = {};
+        securityId.forEach(securityId => {
+            uniqueSecurityIds[securityId.id] = true;
+        });
+
+        for (const id in uniqueSecurityIds) {
+            let securityPayload = {
+                email: email,
+                securityChecklistId: id
+            };
+            let securitycheck = await customerSecurityChecklist.create(securityPayload)
+            return true
+        }
+    }
+}
 
 const createCustomer = async (req, res) => {
     try {
@@ -180,6 +207,7 @@ const createCustomer = async (req, res) => {
             creationTs: Date.now()
         };
         const result = await userModel.create(userPayload)
+        
         return res.status(200).json({
             message: "user created Successfully and An email has been sent to the user for set up the password",
             status: 200

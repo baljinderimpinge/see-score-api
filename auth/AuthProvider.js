@@ -1,7 +1,37 @@
 const msal = require('@azure/msal-node');
 const axios = require('axios');
 const { userModel, subscriptionModel, userTokenmodel, securityChecklist, customerSecurityChecklist } = require("../models")
+const { Op } = require("sequelize");
 const { msalConfig } = require('../common/authConfig');
+
+
+const addSecurity = async (email) => {
+    const existingSecurity = await customerSecurityChecklist.findAll({
+        where: {
+            email: email,
+            isDeleted: false
+        }
+
+    });
+   // console.log(existingSecurity, "existingSecurity")
+    if (existingSecurity.length == 0) {
+        let securityId = await securityChecklist.findAll();
+        const uniqueSecurityIds = {};
+        securityId.forEach(securityId => {
+            uniqueSecurityIds[securityId.id] = true;
+        });
+
+        for (const id in uniqueSecurityIds) {
+            let securityPayload = {
+                email: email,
+                securityChecklistId: id
+            };
+            let securitycheck = await customerSecurityChecklist.create(securityPayload)
+            return true
+        }
+    }
+}
+
 
 class AuthProvider {
     msalConfig;
@@ -148,8 +178,10 @@ class AuthProvider {
                     const refreshToken = refreshTokenObject[Object.keys(refreshTokenObject)[0]].secret;
 
                     freshrefreshtoken = refreshToken;
+                    console.log(freshrefreshtoken,"freshref-----reshtoken")
                     return refreshToken;
                 }
+                console.log(freshrefreshtoken,"freshrefreshtoken")
                 //const expiresDiff = tokenResponse?.extExpiresOn.getTime()-tokenResponse?.expiresOn.getTime()
                 let expiresDiff = Math.floor((new Date(tokenResponse.expiresOn).getTime() - new Date().getTime()) / 1000);
                 let userPayload = {
@@ -161,6 +193,7 @@ class AuthProvider {
                     tokentimestamp: new Date().getTime()
                 }
                 await userTokenmodel.create(userPayload)
+                addSecurity(tokenResponse.account.username)
                 req.session.tokenCache = msalInstance.getTokenCache().serialize();
                 req.session.idToken = tokenResponse.idToken;
                 req.session.account = tokenResponse.account;

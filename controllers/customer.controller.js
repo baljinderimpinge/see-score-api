@@ -192,18 +192,24 @@ const getSecureScores = async (req, res) => {
             ).then(async (result) => {
                 let securityhealthcount = 0;
                 if (useremail) {
-                    securityhealthcount = await customerSecurityChecklist.count({
-                        where: {
-                            email: useremail,
-                            status: 1
-                        }
-                    });
+                    try {
+                        securityhealthcount = await customerSecurityChecklist.count({
+                            where: {
+                                email: useremail,
+                                status: 1
+                            }
+                        }); 
+                    } catch (error) {
+                    }
+                  
                 }
+                console.log(securityhealthcount,"securityhealthcount",useremail)
                 const newdata = data?.data?.value[0]?.controlScores;
                 const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
                 const activestatus = result.data.value;
                 const activeObjects1 = activestatus.filter(obj => obj.status === 'active');
                 let overallcount = activeObjects1.length + securityhealthcount;
+                console.log(overallcount,"overallcount")
                 return res.status(200).json({
                     message: " fetching data",
                     data: activeObjects,

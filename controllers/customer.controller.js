@@ -170,8 +170,19 @@ const getAllThirdData = async (req, res) => {
 };
 
 const getSecureScores = async (req, res) => {
-    const token = req.body.token
+    let token;
     const useremail = req.body.email;
+    if(useremail){
+        const existingUserToken = await userTokenmodel.findOne({
+            where: {
+                email: req.body.email,
+
+            },
+        });
+        if(existingUserToken){
+            token = existingUserToken.dataValues.token
+        }
+    }
     try {
         axios
             .get(`https://graph.microsoft.com/v1.0/security/secureScores`, {
@@ -200,6 +211,7 @@ const getSecureScores = async (req, res) => {
                             }
                         }); 
                     } catch (error) {
+                        console.log(error,"=--=")
                     }
                   
                 }

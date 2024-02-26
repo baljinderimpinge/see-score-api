@@ -5,6 +5,7 @@ const common = require("../common")
 
 const adminAuth = async (req, res, next) => {
     try {
+        console.log(req,"-==-=-=-=-")
         if (req.headers.authorization) {
             let token = req.headers.authorization;
             console.log(token, "*****");
@@ -21,8 +22,7 @@ const adminAuth = async (req, res, next) => {
 
             const admin = await user.findOne({
                 where: {
-                    id: decoded._id,
-                    role: common.constant.CONSTANTS.ADMIN
+                    email: decoded.email
                 }
             });
 
@@ -30,7 +30,7 @@ const adminAuth = async (req, res, next) => {
 
             if (admin) {
 
-                req.admin = admin;
+                req.user = admin.dataValues;
                 next();
             } else {
                 return res.status(403).json({ error: "Unauthorized" });

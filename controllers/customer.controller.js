@@ -95,6 +95,7 @@ const login = async (req, res) => {
         let token = req.body.token;
         let publickey = process.env.PUBLICKEY;
         const decoded = await auth.jwtAuthVerify(token, publickey);
+        console.log(decoded,"d=====+++++++")
         const tokenapi = await axios.post(
             `https://${process.env.AUTH_TOKEN_DOMAIN}/oauth/token`,
             {
@@ -138,6 +139,9 @@ const login = async (req, res) => {
             datamain.role = roles;
             // datamain.app_metadata.role = roles;
         }
+        const jwttoken = await auth.jwtSign({ authid: decoded.sub, email: decoded.email });
+        console.log(jwttoken,"=--=-=-")
+        datamain.jwttoken = jwttoken;
         return res.status(200).json({
             message: "Login successfully",
             data: datamain,
@@ -171,16 +175,21 @@ const getAllThirdData = async (req, res) => {
 
 const getSecureScores = async (req, res) => {
     let token;
-    const useremail = req.body.email;
+    let authemail;
+    console.log(req.user.authid,"req.user")
+    const useremail = req.user.authid;
     if(useremail){
         const existingUserToken = await userTokenmodel.findOne({
             where: {
-                email: req.body.email,
+                userId: req.user.authid,
 
             },
         });
+        console.log(existingUserToken,"existingUserToken")
         if(existingUserToken){
-            token = existingUserToken.dataValues.token
+            token = existingUserToken.dataValues.token,
+            authemail = existingUserToken.dataValues.email,
+            console.log(token,"kiwowioiori")
         }
     }
     try {
@@ -206,7 +215,7 @@ const getSecureScores = async (req, res) => {
                     try {
                         securityhealthcount = await customerSecurityChecklist.count({
                             where: {
-                                email: useremail,
+                                email: authemail,
                                 status: 1
                             }
                         }); 
@@ -295,9 +304,10 @@ const customerToken = async (id) => {
 
 const getRecomendations = async (req, res) => {
     try {
+        let authid = req.user.authid;
         const existingUser = await userTokenmodel.findOne({
             where: {
-                email: req.body.email,
+                userId: authid,
                 isDeleted: false,
             },
         });
@@ -458,13 +468,15 @@ const getAzureToken = async (req, res) => {
 
 const get90daysdata = async (req, res) => {
     try {
+        let authid = req.user.authid;
+        console.log(authid,"authid")
         const existingUser = await userTokenmodel.findOne({
             where: {
-                email: req.body.email,
+                userId:authid,
                 isDeleted: false,
             },
         });
-
+console.log(existingUser,"existingUser")
         if (!existingUser) {
             return res.status(404).json({
                 message: "User not found",
@@ -503,7 +515,7 @@ const get90daysdata = async (req, res) => {
             date: obj.date,
             scoreInPercentage: obj.scoreInPercentage
         }));
-
+console.log(filteredData,"filteredData")
         const filteredData1 = filteredData.map((obj) => {
             const australiaDate = new Date(obj.date);
             const australiaOptions = {
@@ -561,12 +573,22 @@ const addSecurityChecklist = async (req, res) => {
 
 const getSecurityChecklist = async (req, res) => {
     try {
+        console.log(req.user,"jkjdkjdk")
+        let authid = req.user.authid;
+        console.log(authid,"authid")
+        const existingUser = await userTokenmodel.findOne({
+            where: {
+                userId:authid,
+                isDeleted: false,
+            },
+        });
+        console.log(existingUser,"existingUser")
         customerSecurityChecklist.belongsTo(securityChecklist, {
             foreignKey: "securityChecklistId",
         });
         const result = await customerSecurityChecklist.findAll({
             where: {
-                email: req.body.email,
+                email: existingUser.email,
             },
             include: [{
                 model: securityChecklist,
@@ -597,9 +619,19 @@ const getSecurityChecklist = async (req, res) => {
 
 const updateSecurityChecklist = async (req, res) => {
     try {
+        let useremail = req.user.email;
+        let authid = req.user.authid;
+        console.log(authid,"authid")
+        const existingUser = await userTokenmodel.findOne({
+            where: {
+                userId:authid,
+                isDeleted: false,
+            },
+        });
+        console.log(existingUser,"existingUser")
         let condition = {
             where: {
-                email: req.body.email,
+                email: existingUser.email,
                 securityChecklistId: req.body.securityChecklistId,
             },
         };

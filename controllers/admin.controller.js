@@ -157,7 +157,9 @@ const createCustomer = async (req, res) => {
         );
 
         let createuser = newapi.data;
+        console.log(createuser,"wkdwdkwlk")
         let useremail = createuser.email;
+        let authid = createuser.user_id;
         const passApi = await axios.post(
             `https://${process.env.AUTH_TOKEN_DOMAIN}/dbconnections/change_password`,
             {
@@ -195,6 +197,7 @@ const createCustomer = async (req, res) => {
         );
         }
         const userPayload = {
+            authid: authid,
             email: useremail,
             name: req.body.contactName,
             picture: createuser.picture,
@@ -213,6 +216,7 @@ const createCustomer = async (req, res) => {
             status: 200
         })
     } catch (error) {
+        console.log(error,"00000000000000000")
         return res.status(500).json({
             message: "Internal server error!,",
             error: "AxiosError",

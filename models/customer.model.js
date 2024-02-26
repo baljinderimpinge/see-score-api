@@ -4,6 +4,11 @@ const db = require("../connection/db");
 
 const Customer = db.sequelize.define("Customers", {
     //id: { type: Sequelize.INTEGER, primaryKey: true },
+    authid:{
+        type: Sequelize.STRING,
+        defaultValue: null
+
+    },
     name: {
         type: Sequelize.STRING,
         

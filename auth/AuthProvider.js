@@ -49,7 +49,7 @@ class AuthProvider {
 
     login(options = {}) {
         return async (req, res, next) => {
-
+console.log("1111111111111111111")
             /**
              * MSAL Node library allows you to pass your custom state as state parameter in the Request object.
              * The state parameter can also be used to encode information of the app's state before redirect.
@@ -61,7 +61,7 @@ class AuthProvider {
                     authid: req.query.authid
                 })
             );
-
+            console.log("22222222222222222")
             const authCodeUrlRequestParams = {
                 state: state,
 
@@ -83,7 +83,7 @@ class AuthProvider {
                 scopes: options.scopes || [],
                 redirectUri: options.redirectUri,
             };
-
+            console.log("333333333333333333")
             /**
              * If the current msal configuration does not have cloudDiscoveryMetadata or authorityMetadata, we will 
              * make a request to the relevant endpoints to retrieve the metadata. This allows MSAL to avoid making 
@@ -100,7 +100,7 @@ class AuthProvider {
                 this.msalConfig.auth.cloudDiscoveryMetadata = JSON.stringify(cloudDiscoveryMetadata);
                 this.msalConfig.auth.authorityMetadata = JSON.stringify(authorityMetadata);
             }
-
+            console.log("44444444444444444")
             const msalInstance = this.getMsalInstance(this.msalConfig);
             // trigger the first leg of auth code flow
             return this.redirectToAuthCodeUrl(
@@ -156,10 +156,13 @@ class AuthProvider {
     }
 
     handleRedirect(options = {}) {
+        console.log("666666666666666")
         return async (req, res, next) => {
             if (!req.body || !req.body.state) {
+                console.log("7777777777777777777")
                 return next(new Error('Error: response not found'));
             }
+            console.log("8888888888888888888888")
             const state = JSON.parse(this.cryptoProvider.base64Decode(req.body.state));
             const authid = state.authid;
             const authCodeRequest = {
@@ -167,15 +170,19 @@ class AuthProvider {
                 code: req.body.code,
                 codeVerifier: req.session.pkceCodes.verifier,
             };
+            console.log("99999999999999999")
             try {
+                console.log("1010101010101010")
+                console.log(this.msalConfig,"this.msalConfigthis.msalConfig")
                 const msalInstance = this.getMsalInstance(this.msalConfig);
-
+console.log(msalInstance,"msalInstancemsalInstancemsalInstance")
                 if (req.session.tokenCache) {
+                    console.log("111111111001111111")
                     msalInstance.getTokenCache().deserialize(req.session.tokenCache);
                 }
-
+              
                 const tokenResponse = await msalInstance.acquireTokenByCode(authCodeRequest, req.body);
-
+                console.log("12121212121212",tokenResponse)
                 let freshrefreshtoken;
                 const refreshToken = () => {
                     const tokenCache = msalInstance.getTokenCache().serialize();
@@ -237,6 +244,7 @@ class AuthProvider {
      * @returns 
      */
     getMsalInstance(msalConfig) {
+        console.log("55555555555555")
         return new msal.ConfidentialClientApplication(msalConfig);
     }
 

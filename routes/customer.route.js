@@ -15,7 +15,7 @@ router.get("/recomen",middleware.adminAuth,customer.getRecomendations)
 
 router.post("/security",customer.addSecurityChecklist)
 router.get("/getsecurity",middleware.adminAuth, customer.getSecurityChecklist)
-router.post("/updatesecurity",middleware.adminAuth,customer.updateSecurityChecklist)
+router.put("/updatesecurity",middleware.adminAuth,customer.updateSecurityChecklist)
 
 router.get("/graphdata",middleware.adminAuth,customer.get90daysdata)
 

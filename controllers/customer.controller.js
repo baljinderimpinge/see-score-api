@@ -620,6 +620,7 @@ const getSecurityChecklist = async (req, res) => {
 const updateSecurityChecklist = async (req, res) => {
     try {
         let useremail = req.user.email;
+        console.log(req.user,"-=-=-=-=-=-=")
         let authid = req.user.authid;
         console.log(authid,"authid")
         const existingUser = await userTokenmodel.findOne({

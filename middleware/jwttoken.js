@@ -19,6 +19,8 @@ module.exports={
     },
     jwtAuthVerify : async (token, publicKey) => {
         try {
+            console.log(token,"-=-=-=----------")
+            console.log(publicKey,"99999999999")
             return jwt.verify(token, publicKey, { algorithms: ['RS256'] });
         } catch (error) {
             throw error;

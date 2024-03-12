@@ -5,7 +5,8 @@ const middleware = require("../middleware/auth")
 
 router.post("/login",customer.login)
 router.get("/data",customer.getAllThirdData)
-router.get("/get-azure-token/:userId",customer.getAzureToken)
+//router.get("/get-azure-token/:userId",middleware.adminAuth,customer.getAzureToken)
+router.get("/get-azure-token",middleware.adminAuth,customer.getAzureToken)
 
 router.get("/getScoreData",middleware.adminAuth,customer.getSecureScores)
 

@@ -93,7 +93,9 @@ const createUser = async (req, res) => {
 const login = async (req, res) => {
     try {
         let token = req.body.token;
+        console.log(token,"token000000")
         let publickey = process.env.PUBLICKEY;
+        console.log(publickey,"publickey")
         const decoded = await auth.jwtAuthVerify(token, publickey);
         console.log(decoded,"d=====+++++++")
         const tokenapi = await axios.post(
@@ -111,6 +113,7 @@ const login = async (req, res) => {
                 },
             }
         );
+        console.log(tokenapi,"tokenapi78787")
         let newtoken = tokenapi.data.access_token;
         const newapi = await axios.get(
             `https://${process.env.AUTH_TOKEN_DOMAIN}/api/v2/users/${decoded.sub}`,
@@ -140,8 +143,9 @@ const login = async (req, res) => {
             // datamain.app_metadata.role = roles;
         }
         const jwttoken = await auth.jwtSign({ authid: decoded.sub, email: decoded.email });
-        console.log(jwttoken,"=--=-=-")
+        console.log(jwttoken,"jwttoken-----")
         datamain.jwttoken = jwttoken;
+        console.log(datamain,"-----")
         return res.status(200).json({
             message: "Login successfully",
             data: datamain,
@@ -225,8 +229,10 @@ const getSecureScores = async (req, res) => {
                   
                 }
                 console.log(securityhealthcount,"securityhealthcount",useremail)
+               // console.log(data?.data?.value,"data?.data?.valuedata?.data?.value")
                 const newdata = data?.data?.value[0]?.controlScores;
                 const activeObjects = newdata?.filter(obj => obj.controlName === 'UserRiskPolicy');
+              //  const usercount = data?.data?.value[0]?.activeUserCount;
                 const activestatus = result.data.value;
                 const activeObjects1 = activestatus.filter(obj => obj.status === 'active');
                 let overallcount = activeObjects1.length + securityhealthcount;
@@ -234,6 +240,7 @@ const getSecureScores = async (req, res) => {
                 return res.status(200).json({
                     message: " fetching data",
                     data: activeObjects,
+                   // usercount:usercount,
                     findingCount: overallcount,
                     status: 200
                 });
@@ -439,9 +446,11 @@ const addSecurity = async (email) => {
 
 const getAzureToken = async (req, res) => {
     try {
+        console.log(req.user,"req.user11111")
+        let authid = req.user.authid;
         const existingUserToken = await userTokenmodel.findOne({
             where: {
-                userId: req.params.userId,
+                userId: authid
             },
         });
         if (existingUserToken) {
